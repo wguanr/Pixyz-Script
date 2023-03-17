@@ -31,7 +31,7 @@ class clean_bot:
         scene.removeUselessInstances(self._occ)
         scene.resetTransform(1, True, not self.is_instance_reset, False)
 
-    def clean_by_filter(self,filter:filter(function, iterable)):
+    def clean_by_filter(self,filter):
         pass
     
 class geometry_optimazation:
