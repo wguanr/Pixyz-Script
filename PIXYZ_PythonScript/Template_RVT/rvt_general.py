@@ -1,3 +1,6 @@
+
+
+
 useless_occs_filter =  "(Property(\"Name\").Matches(\"^.*dwg.*$\"))"
 max_Occurrence_Name = 64
 selOccs = scene.getSelectedOccurrences()
@@ -7,8 +10,7 @@ filteredOccurrences = scene.getFilteredOccurrences(merged_occs_filter)
 deletedOccurrences = scene.getFilteredOccurrences(useless_occs_filter)
 core.deleteEntities(deletedOccurrences)
 
-#Presets
-scene.resetTransform(1, True, True, False)
+
 scene.renameLongOccurrenceName(max_Occurrence_Name)
 
 #Merge
