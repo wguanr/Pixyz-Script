@@ -1,0 +1,9 @@
+scripts/__pycache__
+vscode.code-workspace
+/.vscode
+input/*
+!input/input
+
+output/*
+!output/output
+desktop.ini
