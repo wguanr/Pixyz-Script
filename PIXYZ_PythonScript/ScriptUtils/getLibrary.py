@@ -50,5 +50,4 @@ def model_factor(lod: LOD_set, PrecisionFactor: float = 1.):
 def set_model_preset(lod:LOD_set):
     pass
 
-def instacing():
-    algo.selectSimilar(occurrences, 0.98, 0.98, False)
+    
