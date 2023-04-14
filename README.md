@@ -19,6 +19,7 @@ RVT是很标准的，考虑基于此进行开发
 
 ### 技术框架图
 ![folder-watcher.png](scenario-processor-sample-main%2Fdocumentation%2Ffolder-watcher.png)
+
 只需要区分
 1. 文件格式类型，
 2. 输入输出
