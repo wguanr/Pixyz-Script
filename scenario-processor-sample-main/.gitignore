@@ -1,0 +1,9 @@
+2_Folder Watcher sample/scripts/__pycache__
+vscode.code-workspace
+/.vscode
+*/_input/*
+*/_output/*
+!*/_input/git
+!*/_output/git
+desktop.ini
+*.bin
