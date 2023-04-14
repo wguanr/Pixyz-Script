@@ -1,0 +1,9 @@
+scripts/__pycache__
+vscode.code-workspace
+/.vscode
+input/格栅背景墙_SU2018.skp
+!input/input
+
+output/*
+!output/output
+desktop.ini

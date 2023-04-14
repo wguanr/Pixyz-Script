@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<module name="sample" version="2021.1.1.5">
+  <include module="Core"/>
+  <include module="IO"/>
+  <function name="convertFile" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="sampleScript.py">
+    <parameters>
+      <parameter name="inputFile" type="ImportFilePath" state="Stable"/>
+      <parameter name="outputFolder" type="OutputDirectoryPath" state="Stable"/>
+      <parameter name="extensions" type="StringList" state="Stable"/>
+      <parameter name="optimization" type="Bool" state="Stable"/>
+    </parameters>
+  </function>
+</module>

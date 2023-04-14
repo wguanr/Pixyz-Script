@@ -1,0 +1,9 @@
+{
+    "input_folder":  "_input/",
+    "output_folder": "_output/",
+    "extensions":
+    [
+        ".fbx",
+        ".obj"
+    ]
+}
