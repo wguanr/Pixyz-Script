@@ -11,9 +11,9 @@ def main(config_file):
 
     waiting = False
 
-    while (1):
-        input_files = [file for file in os.listdir(input_folder) \
-                       if (os.path.isfile(input_folder + '/' + file) \
+    while 1:
+        input_files = [file for file in os.listdir(input_folder)
+                       if (os.path.isfile(input_folder + '/' + file)
                            and os.path.splitext(file)[1] not in ['.xml', ''])]
 
         if len(input_files) == 0:
@@ -30,7 +30,7 @@ def main(config_file):
         # input_folder, output_folder, extensions, ExportName
         execute_Revit_Process(input_folder, output_folder, extensions=extensions, export_name='DefaultOutput')
 
-        os.remove(input_folder + '/' + input_files[0])
+        # os.remove(input_folder + '/' + input_files[0])
         print('Done')
 
 
@@ -78,8 +78,8 @@ def getFileExtension(file):
 
 def execute_Revit_Process(input_folder, output_folder, export_name, extensions):
     args = ['C:\Program Files\PiXYZScenarioProcessor\PiXYZScenarioProcessor.exe', 'ScriptLibrary', 'Revit_Process',
-            "\"" + input_folder.replace("\\", "\\\\") + "\"", "\"" + output_folder.replace("\\", "\\\\") + "\"", str(extensions),
-            "\"" + export_name + "\""]
+            "\"" + input_folder.replace("\\", "\\\\") + "\"", "\"" + output_folder.replace("\\", "\\\\") + "\"",
+            "\"" + export_name + "\"", str(extensions)]
     p = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     while p.poll() is None:
         l = str(p.stdout.readline().rstrip())  # This blocks until it receives a newline.

@@ -4,28 +4,24 @@ max_Occurrence_Name = 64
 
 def clean():
 	# global, called muti time.
-	# print("正在清理" )
 	scene.cleanUnusedMaterials(True)
 	scene.deleteEmptyOccurrences()
 	scene.renameLongOccurrenceName(64)
 	scene.removeUselessInstances(1)
 	scene.resetTransform(1, True, True, False)  # 保留Instances的Transform
-# scene.compress()
+	clean_materials()
 
-# global, called only once.
 # after deleting and merging
 def final_optimize():
-	clean_materials()
+	algo.createInstancesBySimilarity([1], dimensionsSimilarity = 0.95, polycountSimilarity = 0.90, ignoreSymmetry = False, keepExistingPrototypes = True, createNewOccurrencesForPrototypes = True)
 	algo.triangularize([1])
 	# algo.removeDegeneratedPolygons([1], 50)
 	algo.optimizeForRendering([1])
-	algo.createInstancesBySimilarity([1], dimensionsSimilarity = 0.95, polycountSimilarity = 0.90, ignoreSymmetry = False, keepExistingPrototypes = True, createNewOccurrencesForPrototypes = True)
-	# print ("Success! 优化结束！")
+	print("final optimized with instances！")
 
 
 # deprecate!!!!!
 def find_occurrences(DeletedOrMerged):
-
 	if DeletedOrMerged:
 		occs = scene.getFilteredOccurrences(filter_exprs.RVT_deleted_expr)
 	else:
@@ -34,7 +30,6 @@ def find_occurrences(DeletedOrMerged):
 
 
 def clean_filtered_occurrences(FilterExpression):
-
 	try:
 		scene.deleteOccurrences(scene.getFilteredOccurrences(FilterExpression))
 		scene.deleteComponentsByType(2, [1])

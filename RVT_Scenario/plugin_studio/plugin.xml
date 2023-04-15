@@ -10,7 +10,7 @@
     <parameters>
       <parameter name="input_folder" type="DirectoryPath" state="Stable"/>
       <parameter name="output_folder" type="OutputDirectoryPath" state="Stable"/>
-      <parameter name="ExportName" type="String" state="Stable"/>
+      <parameter name="export_name" type="String" state="Stable"/>
       <parameter name="extensions" type="StringList" state="Stable"/>
     </parameters>
   </function>
@@ -22,14 +22,15 @@
   </function>
   <function name="decimating" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
     <parameters>
-      <parameter name="Target_Occurrences" type="OccurrenceList" state="Stable"/>
+      <parameter name="Target_Occurrence" type="OccurrenceList" state="Stable"/>
       <parameter name="Model_Quality" type="QualityPreset" state="Stable"/>
     </parameters>
   </function>
   <function name="final_optimize" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py"/>
   <function name="repairing" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
     <parameters>
-      <parameter name="Model_Quality" type="QualityPreset" state="Stable"/>
+      <parameter name="Target_Occurences" type="OccurrenceList" state="Stable"/>
+			<parameter name="Model_Quality" type="QualityPreset" state="Stable"/>
     </parameters>
   </function>
 </module>

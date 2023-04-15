@@ -16,10 +16,10 @@ def model_factor(ModelPreset) -> float:
 	return model_PrecisionFactor.get(ModelPreset, 0)
 
 
-def repairing(Model_Quality):
+def repairing(Target_Occurences,Model_Quality):
 	# print("正在修复错误……")
 	# TargetOcc = scene.getChildren(target_occurrences)
-	TargetOcc = [scene.getRoot()]
+	TargetOcc = Target_Occurences
 	# cad
 	algo.repairCAD(TargetOcc, 1.000000 * model_factor(Model_Quality), False)
 	algo.retessellate(TargetOcc, 5 * model_factor(Model_Quality), -1, -1, False, 0, 1, 0.0, False, False)
@@ -30,13 +30,13 @@ def repairing(Model_Quality):
 	algo.removeHoles(TargetOcc, True, True, False, 20)
 
 
-def decimating(Target_Occurrences, Model_Quality):
+def decimating(Target_Occurrence, Model_Quality):
 	# print("正在优化三角面……")
 	surfacicTolerance = 10.0 * model_factor(Model_Quality)
 	lineicTolerance = 1 * model_factor(Model_Quality)
 	# query occs
 	TargetOcc = []
-	for occ in scene.getPartOccurrences(Target_Occurrences):
+	for occ in scene.getPartOccurrences(Target_Occurrence):
 		polygon_count = scene.getPolygonCount([occ], True, True, True)
 		if polygon_count > 10000 :
 			TargetOcc.append(occ)
