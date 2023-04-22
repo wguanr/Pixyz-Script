@@ -1,33 +1,71 @@
-# PIXYZ_PythonScript
-  
----
- MyAutomation1 used for Pixyz
----
-*版本：PIXYZ 2022.1*
+# PIXYZ System Lab
 
-# Roadmap
+*MyAutomation1 used for Pixyz*
+*版本：20230417 实现   PIXYZ 2022.1*
+
+![logo_WK.png](Documentation%2Flogo_WK.png)
+
+# Release Notes & Roadmap
 RVT是很标准的，考虑基于此进行开发
-导出了插件文件。
+在PIXYZ 2021版本之后，导入时默认执行一轮优化策略。一些脚本其实已经没啥用了。未来的目标是基于某一类的模型进行定制化的优化。
+另一方面，自从Pixyz被Unity收购之后，各种试用版的限制越来越多，不知道未来会怎么样。所以，这个项目也是为了自己的学习和研究。仅作为一个可行技术路径的探索。
+### 3.1 updates
 
-## 基于scenario processor 部署后台服务
-### 背景
+`处理中`
 
-1. 针对C端上传模型自动化导入UE5的问题
-2. 针对模型处理费力费时，效果差，管控力度不够的问题
-3. 针对数据中台的建设需求
-4. 针对多源3D模型的IO问题。
 
-### 技术框架图
-![folder-watcher.png](scenario-processor-sample-main%2Fdocumentation%2Ffolder-watcher.png)
+`已解决`
 
-只需要区分
-1. 文件格式类型，
-2. 输入输出
-就可以黑箱操作导入导出。
+- bug：解决中文字符转拼音的问题
+- 升级：实现多文件夹监控和递归查询文件，梳理IO层级
+- UE datasmith 无法识别 fbx 层级结构附带属性的问题。只有SMActor才有AssetUserData。
+    - 通过JSON库来导出metadata，进行数模分离
+
+
+
+
+
+### Situation
+
+1. 多源异构模型数据的聚合。
+2. 提升大模型的处理效率和性能。
+3. 批量处理服务开发。
+4. 针对C端上传模型自动化导入UE5的问题
+5. 针对模型处理费力费时，效果差，管控力度不够的问题
+6. 针对数据中台的建设需求
+7. 针对多源3D模型的IO问题。
+
+### Plan
+
+1. 脚本积累，学习Python。（已完成）
+2. 实践应用。基于PixyzStudio设计流程和优化参数。（已完成）
+3. 第一阶段：面向RVT的PixyzScript，根据标准构件和层级关系进行项目级优化。（进行中）
+4. 第二阶段：面向RVT的PixyzSenerioPlugin。
+5. 第三阶段：PixyzScrpt工具库。
+
+- 前提技术基础与难点
+
+- [x]  Python API
+- [x]  Pixyz的bug解决
+- [x]  AWS部署
+
+## Results
+
+
+
+
+## 2.0 基于 scenario processor 部署后台服务
+
+
+### Tech Framework
+![folder-watcher.png](ByPixyzOfficial%2Fscenario-processor-sample-main%2Fdocumentation%2Ffolder-watcher.png)
+
+
 
 `流程：`监控导入文件夹，PIXYZ进行IO和优化，最后提供导出后的文件。98%通过Python实现。
+- 只需要区分`文件格式类型`，`输入输出` 就可以黑箱操作导入导出。
 
-### 优化区块
+### Optimization strategy
 
 1. IO升级，多格式导出。
 2. BIM属性识别与Smart挂接。
@@ -51,6 +89,4 @@ RVT是很标准的，考虑基于此进行开发
 20. 系统优化，处理粘贴复制的检测冲突。
 21. RVT 参考了深圳市的标准文件。基于此进行了测试。
 
-# REVIEW
-在PIXYZ 2021版本之后，导入时默认执行一轮优化策略。一些脚本其实已经没啥用了。未来的目标是基于某一类的模型进行定制化的优化。
-另一方面，自从Pixyz被Unity收购之后，各种试用版的限制越来越多，不知道未来会怎么样。所以，这个项目也是为了自己的学习和研究。仅作为一个可行技术路径的探索。
+

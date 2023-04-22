@@ -1,0 +1,6 @@
+/PIXYZ_PythonScript/
+
+# except for these files
+*.zip
+*.7z
+*.rar

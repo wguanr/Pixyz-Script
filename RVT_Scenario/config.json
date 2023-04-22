@@ -1,9 +1,10 @@
 {
-    "input_folder":  "_input/",
+    "input_folder": "_input/",
     "output_folder": "_output/",
-    "extensions":
-    [
+    "output_custom_name": "",
+    "extensions": [
+        ".pxz",
         ".fbx",
-        ".obj"
+        ".gltf"
     ]
 }

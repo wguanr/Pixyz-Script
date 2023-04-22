@@ -6,32 +6,57 @@ from ctypes import windll
 
 
 def main(config_file):
-    printLogo()
-    input_folder, output_folder, extensions = read_config(config_file)
+    # 暂时不输出output_foloder
+    input_folder, extensions, export_name = read_config(
+        config_file)
 
     waiting = False
 
-    while 1:
-        input_files = [file for file in os.listdir(input_folder)
-                       if (os.path.isfile(input_folder + '/' + file)
-                           and os.path.splitext(file)[1] not in ['.xml', ''])]
+    while (1):
+        i = 1
+        for root, dirs, files in os.walk(input_folder):
+            if not dirs:
+                # 有效的输入和输出文件夹路径在这里定义
+                target_folder = root
+                output_folder = target_folder.replace("input", "output")
+                if not os.path.exists(output_folder):
+                    os.mkdir(output_folder)
+                    print('Output folder created: %s' % output_folder)
+                files = [f for f in os.listdir(target_folder) if os.path.isfile(
+                    os.path.join(target_folder, f))]
 
-        if len(input_files) == 0:
-            if not waiting:
-                print('\n')
-                print('Waiting for files to process...\n')
-                waiting = True
-            continue
-        elif not isCopyFinished(input_folder + '/' + input_files[0]):
-            continue
-        else:
-            waiting = False
+                if len(files) == 0:
+                    if not waiting:
+                        print('\n')
+                        print("Press enter to continue...")
+                        waiting = True
+                    continue
+                elif not isCopyFinished(target_folder + '/' + files[0]):
+                    continue
+                else:
+                    waiting = False
+                ################################
+                if waiting == False:
+                    execute_Revit_Process(
+                        target_folder, output_folder, export_name=export_name, extensions=str(extensions))
+                    i += 1
+                ################################
 
-        # input_folder, output_folder, extensions, ExportName
-        execute_Revit_Process(input_folder, output_folder, extensions=extensions, export_name='DefaultOutput')
+                print('Done')
 
-        # os.remove(input_folder + '/' + input_files[0])
-        print('Done')
+
+def execute_Revit_Process(input_folder, output_folder, export_name, extensions):
+    args = ['C:\Program Files\PiXYZScenarioProcessor\PiXYZScenarioProcessor.exe', 'ScriptLibrary', 'Revit_Process',
+            "\"" + input_folder.replace("\\", "\\\\") + "\"", "\"" +
+            output_folder.replace("\\", "\\\\") + "\"",
+            "\"" + export_name + "\"", str(extensions)]
+
+    p = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf-8')
+
+    # Iterate over the output of the subprocess and print each line
+    for line in p.stdout:
+        print(line.strip())
 
 
 def read_config(config_file):
@@ -42,18 +67,25 @@ def read_config(config_file):
     input_folder = inputs['input_folder']
     # convert relative path to absolute path (if needed)
     input_folder = os.path.abspath(input_folder)
+
     output_folder = inputs['output_folder']
+    if output_folder == '':
+        output_folder = input_folder.replace("input", "output")
     # convert relative path to absolute path
     output_folder = os.path.abspath(output_folder)
+
     extensions = inputs['extensions']
+
+    export_name = inputs['output_custom_name']
 
     print('\n')
     print('Input folder: %s\n' % input_folder)
     print('Output folder: %s\n' % output_folder)
     print('Extensions: %s\n' % ' '.join(extensions))
+    print('Output_custom_name: %s\n' % export_name)
     print('\n')
 
-    return input_folder, output_folder, extensions
+    return input_folder, extensions, export_name
 
 
 def isCopyFinished(inputFile):
@@ -70,42 +102,6 @@ def isCopyFinished(inputFile):
         windll.Kernel32.CloseHandle(handle)
         return True
     return False
-
-
-def getFileExtension(file):
-    return os.path.splitext(file)[1]
-
-
-def execute_Revit_Process(input_folder, output_folder, export_name, extensions):
-    args = ['C:\Program Files\PiXYZScenarioProcessor\PiXYZScenarioProcessor.exe', 'ScriptLibrary', 'Revit_Process',
-            "\"" + input_folder.replace("\\", "\\\\") + "\"", "\"" + output_folder.replace("\\", "\\\\") + "\"",
-            "\"" + export_name + "\"", str(extensions)]
-    p = subprocess.Popen(args, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
-    while p.poll() is None:
-        l = str(p.stdout.readline().rstrip())  # This blocks until it receives a newline.
-        print(l)
-    print(p.stdout.read())
-
-
-def printLogo():
-    print('')
-    print("     #######                %######     ")
-    print("  ##############        &#############& ")
-    print("######      ######    ######      &#####")
-    print("####          &###########          ####")
-    print("####%            ######             ####")
-    print(" #####&       &###### ####        #####%")
-    print("   ######   ######    ######   &######  ")
-    print("     ######& ###        &##########     ")
-    print("       #######             ######       ")
-    print("    &###########&       #### &######    ")
-    print("  ######     ######  &######    ######& ")
-    print(" #####         ##% ######         &####%")
-    print("####%           %#######            ####")
-    print("####%         ############&         ####")
-    print(" #####&    %#####%     ######%    #####%")
-    print("   ############          #############  ")
-    print("     #######                %######     ")
 
 
 if __name__ == "__main__":
