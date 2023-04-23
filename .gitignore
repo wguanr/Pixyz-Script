@@ -1,6 +1,12 @@
 /PIXYZ_PythonScript/
 
+/.idea/
+/.vs/
+/__pycache__/
 # except for these files
 *.zip
 *.7z
 *.rar
+
+/RVT_Scenario/_input/
+/RVT_Scenario/_output/

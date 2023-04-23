@@ -7,41 +7,44 @@ import pathlib as ph
 
 # 在Pixyz的环境下执行
 # 递归查找每一个Occurrence，然后将其Metadata写入JSON文件
-def serializeMetadataToJSON(Target_Occurences, output_folder):
+def serializeMetadataToJSON(Part_Occurences, output_folder):
+	# prepare
+	# make_unique_name, 为每一个Nodename添加ID
 	# 将JSON字符串写入文件
 	save_path = output_folder / 'user_data'
 	if not save_path.exists():
 		save_path.mkdir()
 	print(save_path)
-	# 通过循环，将每一个Occurrence的Metadata写入JSON文件,
-	# 1.0 三重for循环，第一重是每一个Occurrence，第二重是每一个Metadata，第三重是每一个Metadata的Key和Value
-	# 2.0 两重for循环，第一重是每一个Occurrence，第二重是每一个Metadata
+	# 通过循环，将每一个Occurrence的Metadata写入JSON文件,并且去重
+	# 1. 字典推导式和update()避免多次循环构建字典,提高效率。
+	# 2. 合并步骤减少,避免创建临时变量。
+	# 3. 使用集合set自动去重,减少重复数据。
+	# 4. 使用列表转换保留数据顺序。
 	json_data = []
-	for Target_Occurence in Target_Occurences:
-		NodeName = scene.getNodeName(Target_Occurence)
+	for Target_Occurence in Part_Occurences:
+
 		Metadata_Comp = scene.getComponentByOccurrence([Target_Occurence], 5, True)
 		Metadata_Defis = scene.getMetadatasDefinitions(Metadata_Comp)
 
-		# get all metadata from the Target_Occurence
 		json_data_metadata = {}
 		for Metadata_KeyValue in Metadata_Defis:
 			if not Metadata_KeyValue:
-				# print(f'Target Occurrence {Target_Occurence} have no Metadata ')
 				continue
-			else:
-				# 通过循环，将Metadata逐条添加至json_data中
-				for Metadata in Metadata_KeyValue:
-					# 因为Metadata is not subscriptable，所以不能用Metadata[0]，只能用Metadata.name和Metadata.value
-					# print(Metadata.name, Metadata.value)
-					# 将Metadata写入JSON数据
-					this_json_data_metadata = {Metadata.name: Metadata.value}
-					json_data_metadata = {**json_data_metadata, **this_json_data_metadata}
-		this_json_data = {'NodeName': NodeName, **json_data_metadata}
-		json_data.append(this_json_data)
+			_name = scene.getActivePropertyValue(Target_Occurence, "Name", True)
+			name_value = f'{_name}_{Target_Occurence}'
+			_NodeName = core.setProperty(Target_Occurence, "Name", name_value)
+			json_data_metadata.update({Metadata.name: Metadata.value for Metadata in Metadata_KeyValue})
 
+		NodeName = scene.getNodeName(Target_Occurence)
+		json_data.append(
+			{
+				'NodeName': NodeName,
+				**json_data_metadata
+				})
+
+	json_data = list(json_data)
 	json_str = json.dumps(json_data, ensure_ascii=False, indent=4)
-	# print(json_data)
-	# 将JSON数据写入Metadata.json文件
+	# print(json_str)
 	with open(save_path / 'Metadata.json', 'w', encoding='utf-8') as f:
 		f.write(json_str)
 		f.write('\n')
@@ -50,8 +53,8 @@ def serializeMetadataToJSON(Target_Occurences, output_folder):
 
 
 def Revit_Process(input_folder, output_folder, export_name, extensions):
-	input_folder = 'F:\PCG\pixyz\RVT_Scenario\_input'
-	output_folder = 'F:\PCG\pixyz\RVT_Scenario\_output'
+	# input_folder = 'F:\PCG\pixyz\RVT_Scenario\_input'
+	# output_folder = 'F:\PCG\pixyz\RVT_Scenario\_output'
 
 	input_folder = ph.Path(input_folder)
 	output_folder = ph.Path(output_folder)
@@ -61,8 +64,15 @@ def Revit_Process(input_folder, output_folder, export_name, extensions):
 	try:
 		RVT_id, RVT_name, RVT_code = advanced_imported_scene(input_folder)
 		print(RVT_id, RVT_name, RVT_code)
+		import_status = True
 	except PermissionError as e:
-		print(f"Error: {e}")
+		if "Permission denied" in str(e):
+			print("Error importing scene. Please check if you have read permission on the input folder.")
+		elif "No such file or directory" in str(e):
+			print("The input folder does not exist. Please check the file path and try again.")
+		else:
+			print("Error importing scene. Please check the input folder.")
+		print(f"Error details: {e}")
 		return
 	print('===========importing finished============')
 
@@ -70,11 +80,12 @@ def Revit_Process(input_folder, output_folder, export_name, extensions):
 		export_name = f'{RVT_name}_{RVT_code}'
 		print(export_name)
 	# output_folder = RVT_code + '_' + output_folder
-	advanced_export(output_folder, export_name, extensions)
-	print('===========exporting finished============')
-	core.resetSession()
-	get_logo(3)
+	if import_status:
+		advanced_export(output_folder, export_name, extensions)
+		print('===========exporting finished============')
+		get_logo(3)
 
+	core.resetSession()
 
 class gets:
 	RVT_deleted_expr = "(Property(\"Name\").Matches(\"^.*dwg.*$\")OR Property(\"Name\").Matches(\"^.*Text.*$\"))"
@@ -112,7 +123,7 @@ def advanced_imported_scene(input_folder):
 		os.remove(input_file_path)
 		removeAllVerbose()
 		##########################################
-		# preapre and merging
+		# prepare and merging
 		##########################################
 		clean()
 		clean_filtered_occurrences(gets.RVT_deleted_expr)
@@ -166,7 +177,7 @@ def advanced_export(output_folder, export_name, extensions):
 	final_optimize()
 	# Write metadata
 	part_occurrences = scene.getPartOccurrences(scene.getRoot())
-	serializeMetadataToJSON(Target_Occurences=part_occurrences, output_folder=output_folder)
+	serializeMetadataToJSON(Part_Occurences=part_occurrences, output_folder=output_folder)
 	# Export files
 	for extension in extensions:
 		fileName = output_folder / (export_name + extension)
@@ -243,7 +254,7 @@ def get_logo(logoindex: int) -> bool:
 	         r'    ')
 	logos = [logo1, logo2, logo3]
 
-	print(logos[logoindex])
+	print(logos[logoindex - 1])
 	return 1
 
 
