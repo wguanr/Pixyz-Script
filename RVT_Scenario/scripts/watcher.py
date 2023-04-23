@@ -12,8 +12,8 @@ def main(config_file):
 		config_file)
 
 	waiting = False
-	for i in range(5):
-		rn(input_folder)
+	# for i in range(5):
+	# 	rn(input_folder)
 
 	while (1):
 		i = 1
