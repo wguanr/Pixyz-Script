@@ -7,6 +7,13 @@
 *.zip
 *.7z
 *.rar
+*.fbx
+*.obj
+*.mtl
+*.pxzext
+*.log
 
-/RVT_Scenario/_input/
-/RVT_Scenario/_output/
+
+/_input/
+/_output/
+
