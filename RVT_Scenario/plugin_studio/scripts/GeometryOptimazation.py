@@ -10,7 +10,7 @@ def model_factor(ModelPreset) -> float:
     model_PrecisionFactor = {
         process.QualityPreset.Low: 50.0,
         process.QualityPreset.Medium: 15.0,
-        process.QualityPreset.High: 2.0,
+        process.QualityPreset.High: 2.5,
         process.QualityPreset.VeryHigh: 0.5,
     }
     return model_PrecisionFactor.get(ModelPreset, 0)
@@ -26,10 +26,10 @@ def repairing(Target_Occurences, Model_Quality):
                       1, -1, False, 0, 1, 0.0, False, False)
     # algo.tessellateRelativelyToAABB([1], 0.200000, 0.000300, -1, -1, True, 0, 1, 0.000000, False, False, True,False)
     # mesh
-    algo.repairMesh(TargetOcc, 1 * model_factor(Model_Quality), False, True)
-    algo.repairNullNormals(TargetOcc)
+    algo.repairMesh(TargetOcc, 1 * model_factor(Model_Quality), True, True)
     algo.removeHoles(TargetOcc, True, True, False, 20)
-
+    algo.repairNullNormals(TargetOcc)
+    algo.createNormals(TargetOcc, -1.000000000000, True, True)
 
 def decimating(Target_Occurrence, Model_Quality):
     # print("正在优化三角面……")
@@ -51,3 +51,5 @@ def decimating(Target_Occurrence, Model_Quality):
             TargetOcc, surfacicTolerance * 0.6, 1., 1., 1., 1., 10., -1, True, -1, -1, False, 0)
         algo.decimate(TargetOcc, surfacicTolerance,
                       lineicTolerance, 10, -1, False)
+    algo.repairNullNormals(TargetOcc)
+    algo.createNormals(TargetOcc, -1.000000000000, True, True)

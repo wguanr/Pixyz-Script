@@ -12,7 +12,8 @@
 *.mtl
 *.pxzext
 *.log
-
+*.exe
+*.mp4
 
 /_input/
 /_output/

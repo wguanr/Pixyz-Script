@@ -12,8 +12,10 @@ def main(config_file):
 		config_file)
 
 	waiting = False
-	# for i in range(5):
-	# 	rn(input_folder)
+	for root, dirs, files in os.walk(input_folder):
+		if dirs:
+			rn(dirs)
+	print('Renaming finished')
 
 	while (1):
 		i = 1
