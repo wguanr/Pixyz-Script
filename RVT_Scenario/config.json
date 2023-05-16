@@ -1,7 +1,7 @@
 {
     "input_folder": "_input/",
-    "output_folder": "_output/",
     "output_custom_name": "",
+    "current_pattern_index": 1,
     "extensions": [
         ".pxz",
         ".fbx",

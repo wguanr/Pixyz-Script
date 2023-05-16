@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<module name="ScriptLibrary" version="2022.1.1.4">
+  <include module="Algo"/>
+  <include module="Core"/>
+  <include module="IO"/>
+  <include module="Material"/>
+  <include module="Process"/>
+  <include module="Scene"/>
+  <function name="Revit_Process" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="ScriptLibrary.py">
+    <parameters>
+      <parameter name="input" type="DirectoryPath" state="Stable"/>
+      <parameter name="output" type="OutputDirectoryPath" state="Stable"/>
+      <parameter name="export_name" type="String" state="Stable"/>
+      <parameter name="extensions" type="StringList" state="Stable"/>
+      <parameter name="pattern_index" type="Int" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="advanced_imported_scene" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="ScriptLibrary.py">
+    <parameters>
+      <parameter name="files_to_import" type="FilePathList" state="Stable"/>
+      <parameter name="RVT_code" type="String" state="Stable"/>
+      <parameter name="pattern_index" type="Int" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="clean" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py"/>
+  <function name="clean_filtered_occurrences" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py">
+    <parameters>
+      <parameter name="FilterExpression" type="FilterExpression" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="decimating" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
+    <parameters>
+      <parameter name="Target_Occurrence" type="OccurrenceList" state="Stable"/>
+      <parameter name="Model_Quality" type="QualityPreset" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="final_optimize" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py"/>
+  <function name="repairing" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
+    <parameters>
+      <parameter name="Target_Occurences" type="OccurrenceList" state="Stable"/>
+      <parameter name="Model_Quality" type="QualityPreset" state="Stable"/>
+    </parameters>
+  </function>
+</module>
