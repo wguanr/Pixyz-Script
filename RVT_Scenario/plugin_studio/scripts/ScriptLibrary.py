@@ -1,8 +1,20 @@
-import os
 import time
 import json
 import os
 import pathlib as ph
+import LocalSuperviser as LS
+
+
+class GetParameters:
+	RVT_deleted_expr = "(Property(\"Name\").Matches(\"^.*dwg.*$\")OR Property(\"Name\").Matches(\"^.*Text.*$\"))"
+	# 映射关系
+	Category = "Other/Category"
+	# wall = scene.findByMetadata(Category, "^.*Wall.*", occs_root)
+	RVT_ElementsList_One = ['Wall', 'Floor', 'Rail', 'Site', 'Pipes', 'Pipe Fitting', 'Cable Tray', 'Ducts',
+	                        'Duct Fitting']
+	RVT_ElementsList_ISM = ['Window', 'Door', 'Stair', 'Equipment', 'Structural Column', 'Structural Framing',
+	                        'Sprinkler',
+	                        'Accessories', 'Curtain', 'Air Terminals']
 
 
 # 在Pixyz的环境下执行
@@ -52,123 +64,121 @@ def serializeMetadataToJSON(Part_Occurences, output_folder):
 	return save_path
 
 
-def Revit_Process(input_folder, output_folder, export_name, extensions):
+
+def Revit_Process(input, output, export_name, extensions, pattern_index):
 	# input_folder = 'F:\PCG\pixyz\RVT_Scenario\_input'
 	# output_folder = 'F:\PCG\pixyz\RVT_Scenario\_output'
 
-	input_folder = ph.Path(input_folder)
-	output_folder = ph.Path(output_folder)
-
+	input_folder = ph.Path(input)
+	output_folder = ph.Path(output)
+	DebugMode = True
 	get_logo(1)
+	# input_folder = 'F:\PCG\pixyz\RVT_Scenario\_input'
+	isValid = LS.isValid(input_folder, pattern_index)
+	if isValid:
+		fl, k, w = LS.getALL(input_folder)
+		for f in fl:
+			for _k in k:
+				if f.get(_k):
+					# prepare to import all files in this directory
+					print(_k, f.get(_k))
+					models_to_import = f.get(_k)
+					RVT_id = 8888
+					RVT_code = 'X'
+					isImported = False
+					for _model in models_to_import:
+						RVT_id, RVT_name, RVT_code, _ext = LS.getInfoFromFile(_model, pattern_index)
+						print(RVT_id, RVT_name, RVT_code)
 
+						# execute importing
+						isImported = advanced_imported_scene([_model], RVT_code)
+					if not export_name:
+						export_name = f'{RVT_id}_{RVT_code}'
+
+					if isImported and not DebugMode:
+						print('===========importing finished============')
+						# after import then execute to export
+						advanced_export(output_folder, export_name, extensions)
+						print('===========exporting finished============')
+						get_logo(3)
+						core.resetSession()
+
+
+def advanced_imported_scene(files_to_import, RVT_code):
 	try:
-		RVT_id, RVT_name, RVT_code = advanced_imported_scene(input_folder)
-		print(RVT_id, RVT_name, RVT_code)
-		import_status = True
+		for file in files_to_import:
+			# 0. get current_RootOccurence
+			current_RootOccurence = process.guidedImport(
+				[str(file)], pxz.process.CoordinateSystemOptions(
+					["automaticOrientation", 0],
+					["automaticScale", 0], False,
+					False), ["usePreset", 2],
+				pxz.process.ImportOptions(
+					False, True, True), False, False, False, False, False,
+				False)
+			t0, n_triangles, n_vertices, n_parts = getStats(current_RootOccurence[0])
+			removeAllVerbose()
+			##########################################
+			# 1. prepare and merging
+			##########################################
+			clean()
+			clean_filtered_occurrences(GetParameters.RVT_deleted_expr)
+			clean_materials(current_RootOccurence)
+			scene.mergePartsByAssemblies([1], 2)
+			##########################################
+			# 2. main optimization
+			##########################################
+			optimization_RVT(current_RootOccurence, RVT_code)
+			##########################################
+			t1, _n_triangles, _n_vertices, _n_parts = getStats(current_RootOccurence[0])
+			addAllVerbose()
+			FileName = scene.getNodeName(current_RootOccurence[0])
+			printStats(
+				FileName, t1 - t0, n_triangles, _n_triangles,
+				n_vertices, _n_vertices, n_parts, _n_parts)
+		scene.deleteEmptyOccurrences()
+		return True
 	except PermissionError as e:
 		if "Permission denied" in str(e):
-			print("Error importing scene. Please check if you have read permission on the input folder.")
+			print(
+				"Error importing scene. Please check if you have read permission on the input folder.")
 		elif "No such file or directory" in str(e):
 			print("The input folder does not exist. Please check the file path and try again.")
 		else:
 			print("Error importing scene. Please check the input folder.")
 		print(f"Error details: {e}")
-		return
-	print('===========importing finished============')
-
-	if not export_name:
-		export_name = f'{RVT_name}_{RVT_code}'
-		print(export_name)
-	# output_folder = RVT_code + '_' + output_folder
-	if import_status:
-		advanced_export(output_folder, export_name, extensions)
-		print('===========exporting finished============')
-		get_logo(3)
-
-	core.resetSession()
-
-class gets:
-	RVT_deleted_expr = "(Property(\"Name\").Matches(\"^.*dwg.*$\")OR Property(\"Name\").Matches(\"^.*Text.*$\"))"
-	# 映射关系
-	Category = "Other/Category"
-	# wall = scene.findByMetadata(Category, "^.*Wall.*", occs_root)
-	RVT_ElementsList_One = ['Wall', 'Floor', 'Rail', 'Site', 'Pipes', 'Pipe Fitting', 'Cable Tray', 'Ducts',
-	                        'Duct Fitting']
-	RVT_ElementsList_ISM = ['Window', 'Door', 'Equipment', 'Structural Column', 'Structural Framing', 'Sprinkler',
-	                        'Accessories', 'Curtain', 'Air Terminals']
+		return False
 
 
-def advanced_imported_scene(input_folder):
-	global RVT_id, RVT_name, RVT_code
-	supported_extensions = [".rvt", ".rfa"]
-	input_folder_files_name = [file for file in os.listdir(input_folder) if (
-			os.path.isfile(input_folder / file) and os.path.splitext(file)[1] in supported_extensions)]
-	elmts = gets.RVT_ElementsList_ISM + gets.RVT_ElementsList_One
-	print(input_folder_files_name)
-	for file in input_folder_files_name:
+def optimization_RVT(current_RootOccurence, RVT_code):
+	"""
+	Do merging, repairing, decimating using Pixyz!
 
-		input_file_path = input_folder / file
+	:param current_RootOccurence: list of guidedImported occurences
+	:param RVT_code: SS为钢结构，E为电气, P为管道, S为结构, M为机电, A为建筑, T为智能化
+	"""
+	elmts = GetParameters.RVT_ElementsList_ISM + GetParameters.RVT_ElementsList_One
+	# create current_RootOccurence for each element, merged and prepare for instancing, remain generic models
+	_count = 0
+	for i in elmts:
+		_count = _count + 1
+		_rex = '^.*' + i + '.*'
+		_ism = scene.findByMetadata(GetParameters.Category, _rex, current_RootOccurence)
+		if _ism:
+			_occ = scene.createOccurrenceFromSelection(
+				i, _ism, current_RootOccurence[0], True)
+			print(scene.getNodeName(_occ) + ' has been created')
+			if _count > len(GetParameters.RVT_ElementsList_ISM):
+				scene.mergeParts([_occ], 2)
 
-		print(input_file_path)
-		occs = process.guidedImport(
-			[str(input_file_path)], pxz.process.CoordinateSystemOptions(
-				["automaticOrientation", 0],
-				["automaticScale", 0], False,
-				False), ["usePreset", 2],
-			pxz.process.ImportOptions(
-				False, True, True), False, False, False, False, False,
-			False)
-		t0, n_triangles, n_vertices, n_parts = getStats(occs[0])
-		# remove input file incase imported again by watcher
-		os.remove(input_file_path)
-		removeAllVerbose()
-		##########################################
-		# prepare and merging
-		##########################################
-		clean()
-		clean_filtered_occurrences(gets.RVT_deleted_expr)
-		clean_materials(occs)
-		# pre merging
-		scene.mergePartsByAssemblies([1], 2)
-
-		# create occs for each element, merged and prepare for instancing, remain generic models
-		_count = 0
-		for i in elmts:
-			_count = _count + 1
-			_rex = '^.*' + i + '.*'
-			_ism = scene.findByMetadata(gets.Category, _rex, occs)
-			if _ism:
-				_occ = scene.createOccurrenceFromSelection(
-					i, _ism, occs[0], True)
-				print(scene.getNodeName(_occ) + ' has been created')
-				if _count > len(gets.RVT_ElementsList_ISM):
-					scene.mergeParts([_occ], 2)
-		##########################################
-		# repair and decimate
-		##########################################
-		FileName = os.path.splitext(file)[0]
-		RVT_code = FileName.split("_")[2]
-		RVT_id = FileName.split("_")[0]
-		RVT_name = FileName.split("_")[1]  # 可能是拼音哦
-		# SS为钢结构，E为电气, P为管道, S为结构, M为机电, A为建筑, T为智能化
-		if RVT_code in ["S", "GL"]:
-			repairing(occs, 3)
-			decimating(occs[0], 2)
-		if RVT_code in ["M", "A", "SS", "E", "T"]:
-			repairing(occs, 2)
-			decimating(occs[0], 2)
-		if RVT_code in ["P"]:
-			decimating(occs[0], 1)
-		##########################################
-		t1, _n_triangles, _n_vertices, _n_parts = getStats(occs[0])
-		addAllVerbose()
-		printStats(
-			FileName, t1 - t0, n_triangles, _n_triangles,
-			n_vertices, _n_vertices, n_parts, _n_parts)
-	scene.deleteEmptyOccurrences()
-	print(RVT_id, RVT_name, RVT_code)
-	print('\n===========importing finished============\n')
-	return RVT_id, RVT_name, RVT_code
+	if RVT_code in ["S", "GL"]:
+		repairing(current_RootOccurence, 3)
+		decimating(current_RootOccurence[0], 2)
+	if RVT_code in ["M", "A", "SS", "E", "T", "AR"]:
+		repairing(current_RootOccurence, 2)
+		decimating(current_RootOccurence[0], 2)
+	if RVT_code in ["P"]:
+		decimating(current_RootOccurence[0], 1)
 
 
 def advanced_export(output_folder, export_name, extensions):

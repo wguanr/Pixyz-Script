@@ -5,7 +5,7 @@ import subprocess
 from ctypes import windll
 from rename_chinese_advanced import main as rn
 
-
+#todo actually we don't need watch all the time, the program should be called by user.
 def main(config_file):
 	# 暂时不输出output_foloder
 	input_folder, extensions, export_name = read_config(
@@ -19,28 +19,28 @@ def main(config_file):
 
 	while (1):
 		i = 1
-		for root, dirs, files in os.walk(input_folder):
-			if not dirs:
-				# 有效的输入和输出文件夹路径在这里定义
-				target_folder = root
-				output_folder = target_folder.replace("input", "output")
-				if not os.path.exists(output_folder):
-					os.mkdir(output_folder)
-					print('Output folder created: %s' % output_folder)
-				files_in_root = [f for f in os.listdir(target_folder) if os.path.isfile(
-					os.path.join(target_folder, f))]
-
-				if len(files_in_root) == 0:
-					if not waiting:
-						print('\n')
-						print("Press enter to continue...")
-						waiting = True
-					continue
-				elif not isCopyFinished(target_folder + '/' + files_in_root[0]):
-					continue
-				else:
-					waiting = False
-				################################
+		# for root, dirs, files in os.walk(input_folder):
+		# 	if not dirs:
+		# 		# 有效的输入和输出文件夹路径在这里定义
+		# 		target_folder = root
+		# 		output_folder = target_folder.replace("input", "output")
+		# 		if not os.path.exists(output_folder):
+		# 			os.mkdir(output_folder)
+		# 			print('Output folder created: %s' % output_folder)
+		# 		files_in_root = [f for f in os.listdir(target_folder) if os.path.isfile(
+		# 			os.path.join(target_folder, f))]
+		#
+		# 		if len(files_in_root) == 0:
+		# 			if not waiting:
+		# 				print('\n')
+		# 				print("Press enter to continue...")
+		# 				waiting = True
+		# 			continue
+		# 		elif not isCopyFinished(target_folder + '/' + files_in_root[0]):
+		# 			continue
+		# 		else:
+		# 			waiting = False
+		# 		################################
 				if waiting == False:
 					execute_Revit_Process(
 						target_folder, output_folder, export_name=export_name, extensions=str(extensions))
@@ -91,21 +91,6 @@ def read_config(config_file):
 	return input_folder, extensions, export_name
 
 
-def isCopyFinished(inputFile):
-	"""
-	Check if the file that was dropped in the input folder has finished being copied
-	"""
-	GENERIC_WRITE = 1 << 30
-	FILE_SHARE_READ = 0x00000001
-	OPEN_EXISTING = 3
-	FILE_ATTRIBUTE_NORMAL = 0x80
-	handle = windll.Kernel32.CreateFileW(
-		inputFile, GENERIC_WRITE, FILE_SHARE_READ, None, OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL, None)
-	if handle != -1:
-		windll.Kernel32.CloseHandle(handle)
-		return True
-	return False
 
 
 if __name__ == "__main__":
