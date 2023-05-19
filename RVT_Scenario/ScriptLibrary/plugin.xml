@@ -11,7 +11,7 @@
       <parameter name="input" type="DirectoryPath" state="Stable"/>
       <parameter name="output" type="OutputDirectoryPath" state="Stable"/>
       <parameter name="export_name" type="String" state="Stable"/>
-      <parameter name="extensions" type="StringList" state="Stable"/>
+      <parameter name="extensions" type="StringList" optional="true" default="[&quot;.fbx&quot;, &quot;.gltf&quot;]" state="Stable"/>
       <parameter name="pattern_index" type="Int" state="Stable"/>
     </parameters>
   </function>
@@ -35,6 +35,23 @@
     </parameters>
   </function>
   <function name="final_optimize" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py"/>
+  <function name="getALL" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="LocalSuperviser.py">
+    <parameters>
+      <parameter name="input_folder" type="DirectoryPath" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="getInfoFromFile" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="LocalSuperviser.py">
+    <parameters>
+      <parameter name="file_path" type="FilePath" state="Stable"/>
+      <parameter name="pattern_index" type="Int" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="isValid" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="LocalSuperviser.py">
+    <parameters>
+      <parameter name="input_folder" type="DirectoryPath" state="Stable"/>
+      <parameter name="pattern_index" type="Int" state="Stable"/>
+    </parameters>
+  </function>
   <function name="repairing" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
     <parameters>
       <parameter name="Target_Occurences" type="OccurrenceList" state="Stable"/>

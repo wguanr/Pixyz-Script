@@ -1,11 +1,12 @@
-# PIXYZ System Lab
+
+![building Equipments.png](Documentation%2Fbuilding%20Equipments.png)
+
+# - PIXYZ System -
 
 *MyAutomation1 used for Pixyz*
 *版本：20230417 实现   PIXYZ 2022.1*
 
-![logo_WK.png](Documentation%2Flogo_WK.png)
-
-# Release Notes & Roadmap
+## Release Notes & Roadmap
 RVT是很标准的，考虑基于此进行开发
 在PIXYZ 2021版本之后，导入时默认执行一轮优化策略。一些脚本其实已经没啥用了。未来的目标是基于某一类的模型进行定制化的优化。
 另一方面，自从Pixyz被Unity收购之后，各种试用版的限制越来越多，不知道未来会怎么样。所以，这个项目也是为了自己的学习和研究。仅作为一个可行技术路径的探索。
@@ -96,3 +97,4 @@ RVT是很标准的，考虑基于此进行开发
 21. RVT 参考了深圳市的标准文件。基于此进行了测试。
 
 
+![logo_WK.png](Documentation%2Flogo_WK.png)

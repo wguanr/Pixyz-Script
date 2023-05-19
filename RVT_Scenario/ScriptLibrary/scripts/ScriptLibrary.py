@@ -17,10 +17,9 @@ class GetParameters:
 	RVT_merge_byName = "(Property(\"Name\").Matches(\"^.*Stairs.*$\")OR Property(\"Name\").Matches(\"^.*Walls.*$\")OR Property(\"Name\").Matches(\"^.*Floors.*$\"))"
 	Category = "Other/Category"
 	# wall = scene.findByMetadata(Category, "^.*Wall.*", occs_root)
-	RVT_ElementsList_One = ['Wall', 'Floor', 'Rail', 'Site', 'Pipes', 'Pipe Fitting', 'Cable Tray', 'Ducts',
-	                        'Duct Fitting']
+	RVT_ElementsList_One = ['Wall', 'Floor', 'Rail', 'Site', 'Pipes', 'Cable Tray', 'Fitting', 'Ducts', 'Duct Insulation']
 	RVT_ElementsList_ISM = ['Window', 'Door', 'Stairs', 'Equipment', 'Structural Column', 'Structural Framing',
-	                        'Sprinkler', 'Accessories', 'Curtain', 'Air Terminals']
+	                        'Sprinkler', 'Accessories', 'Curtain', 'Air Terminals','Generic Model']
 
 
 # Todo add commuication with Pixyz:
@@ -37,8 +36,12 @@ def Revit_Process(input, output, export_name, extensions, pattern_index):
 	output_folder = ph.Path(output)
 
 	get_logo(1)
-
-	if isValid(input_folder, pattern_index):
+	b_isValid = isValid(input_folder, pattern_index)
+	print('file check result:')
+	print('------------------')
+	print(b_isValid)
+	print('------------------ \n')
+	if b_isValid:
 		fl, k, w = getALL(input_folder)
 		for f in fl:
 			for _k in k:
@@ -46,11 +49,12 @@ def Revit_Process(input, output, export_name, extensions, pattern_index):
 					# prepare to import all files in this directory
 					models_to_import = f.get(_k)
 					isImported = False
+					print(models_to_import)
 					RVT_id, RVT_name, RVT_code = getInfoFromFile(models_to_import[0], pattern_index)
 					_output_folder = output_folder / str(RVT_id) / str(RVT_code)
 					if not _output_folder.exists():
 						_output_folder.mkdir()
-
+					print('current output folder is:' + str(_output_folder))
 					# set log file path
 					log_path = _output_folder / 'pixyz.log'
 					core.setLogFile(str(log_path))
@@ -72,7 +76,12 @@ def Revit_Process(input, output, export_name, extensions, pattern_index):
 						print('===========exporting finished============')
 						get_logo(3)
 					core.resetSession()
-	# core.message("\n Revit_Process finished \n")
+	else:
+		print('===========file is in valid============')
+		get_logo(2)
+		return
+
+# core.message("\n Revit_Process finished \n")
 
 
 def advanced_imported_scene(files_to_import, RVT_code, pattern_index):
@@ -277,7 +286,7 @@ def printStats(fileName, t, n_triangles, _n_triangles, n_vertices, _n_vertices, 
 
 
 # Get logo based on logoindex
-def get_logo(logoindex: int) -> bool:
+def get_logo(logoindex: int):
 	logo1 = (r'' '\n'
 	         r' _       __ __  __ __ __ ____   _   __ ______' '\n'
 	         r'| |     / // / / // //_// __ \ / | / // ____/' '\n'
@@ -308,7 +317,7 @@ def get_logo(logoindex: int) -> bool:
 	logos = [logo1, logo2, logo3]
 
 	print(logos[logoindex - 1])
-	return 1
+	return True
 
 
 def removeAllVerbose():

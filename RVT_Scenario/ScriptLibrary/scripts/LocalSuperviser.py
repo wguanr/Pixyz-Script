@@ -2,6 +2,7 @@ import re
 from ctypes import windll
 import os
 import random
+import pathlib as pl
 
 # file name would be all with '_' and no space
 pattern_hasID = r"^(\d+)_([^_]+?)_([A-Z]+)"
@@ -43,25 +44,14 @@ def getALL(input_folder):
 	waiting = False
 	for root, dirs, files in os.walk(input_folder):
 		if not dirs:
-			if len(files) == 0:
-				if not waiting:
-					print('\n')
-					print("Press enter to continue...")
-					waiting = True
-				continue
-			elif not isCopyFinished(root + '/' + files[0]):
-				continue
-			else:
-				waiting = False
-
 			_key = root.split('\\')[-1]
 			keys.append(_key)
 			# print(_key)
 			filepaths = [root + '/' + file for file in files]
 			target_files_dic = {_key: filepaths}
 			# 有效的输入和输出文件夹路径在这里定义
-			# print(root)
-			# print(files)
+			print(root)
+			print(files)
 			filelist_from_rootFolder.append(target_files_dic)
 
 	return filelist_from_rootFolder, keys, waiting
@@ -107,7 +97,7 @@ def isValid(input_folder, pattern_index) -> bool:
 
 
 # 	return RVTid, RVTname, RVTcode, extension
-def getInfoFromFile(file_path, pattern_index: int):
+def getInfoFromFile(file_path, pattern_index):
 	"""
 	Get info from the file
 	:param file_path: the file path to get the info
@@ -132,12 +122,11 @@ def getInfoFromFile(file_path, pattern_index: int):
 
 	return rvt_id, rvt_name, rvt_code
 
-
-# if run the script directly, then execute the function get_all()
+# #
 # if __name__ == '__main__':
 # 	input_folder = 'F:\PCG\pixyz\RVT_Scenario\_input'
 # 	fl, k, w = getALL(input_folder)
-#
+# 	input_folder = pl.Path(input_folder)
 # 	isValid = isValid(input_folder, 1)
 # 	print(isValid)
 # 	for f in fl:
@@ -146,5 +135,5 @@ def getInfoFromFile(file_path, pattern_index: int):
 # 				print(_k, f.get(_k))
 # 				models_to_import = f.get(_k)
 # 				for _model in models_to_import:
-# 					rvt_id, rvt_name, rvt_code, extension = getInfoFromFile(_model, 1)
-# 					print(rvt_id, rvt_name, rvt_code, extension)
+# 					rvt_id, rvt_name, rvt_code = getInfoFromFile(_model, 1)
+# 					print(rvt_id, rvt_name, rvt_code)

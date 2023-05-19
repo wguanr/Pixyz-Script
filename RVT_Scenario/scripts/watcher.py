@@ -15,7 +15,10 @@ def main(config_file):
 		print('Output folder created: %s' % output_folder)
 
 	rn(input_folder)
-
+	print('input_folder: ' + input_folder)
+	print('output_folder: ' + output_folder)
+	print('export_name: ' + export_name)
+	print('extensions: ' + str(extensions))
 	process_revit_files(
 		input_folder, output_folder, export_name=export_name, extensions=str(extensions),
 		pattern_index=current_pattern_index)
@@ -50,7 +53,6 @@ def process_revit_files(input_folder, output_folder, export_name, extensions, pa
 		print(line, end='')
 
 
-
 def read_config(config_file):
 	"""
 	Read config file and return the arguments
@@ -74,13 +76,13 @@ def read_config(config_file):
 
 	export_name = inputs['output_custom_name']
 	current_pattern_index = inputs['current_pattern_index']
-	print('\n')
-	print('Input folder: %s\n' % input_folder)
-	# print('Output folder: %s\n' % output_folder)
-	print('Extensions: %s\n' % ' '.join(extensions))
-	print('Output_custom_name: %s\n' % export_name)
-	print('Current_pattern_index: %s\n' % current_pattern_index)
-	print('\n')
+	# print('\n')
+	# print('Input folder: %s\n' % input_folder)
+	# # print('Output folder: %s\n' % output_folder)
+	# print('Extensions: %s\n' % ' '.join(extensions))
+	# print('Output_custom_name: %s\n' % export_name)
+	# print('Current_pattern_index: %s\n' % current_pattern_index)
+	# print('\n')
 
 	return input_folder, extensions, export_name, current_pattern_index
 
