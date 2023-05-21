@@ -3,7 +3,6 @@ import json
 import os
 import pathlib as ph
 
-
 DebugMode = False
 
 
@@ -17,9 +16,10 @@ class GetParameters:
 	RVT_merge_byName = "(Property(\"Name\").Matches(\"^.*Stairs.*$\")OR Property(\"Name\").Matches(\"^.*Walls.*$\")OR Property(\"Name\").Matches(\"^.*Floors.*$\"))"
 	Category = "Other/Category"
 	# wall = scene.findByMetadata(Category, "^.*Wall.*", occs_root)
-	RVT_ElementsList_One = ['Wall', 'Floor', 'Rail', 'Site', 'Pipes', 'Cable Tray', 'Fitting', 'Ducts', 'Duct Insulation']
+	RVT_ElementsList_One = ['Wall', 'Floor', 'Rail', 'Site', 'Pipes', 'Cable Tray', 'Fitting', 'Ducts',
+	                        'Duct Insulation']
 	RVT_ElementsList_ISM = ['Window', 'Door', 'Stairs', 'Equipment', 'Structural Column', 'Structural Framing',
-	                        'Sprinkler', 'Accessories', 'Curtain', 'Air Terminals','Generic Model']
+	                        'Sprinkler', 'Accessories', 'Curtain', 'Air Terminals', 'Generic Model']
 
 
 # Todo add commuication with Pixyz:
@@ -28,7 +28,7 @@ class GetParameters:
 #  core.setInteractiveMode(True)
 #  core.checkLicense()
 
-def Revit_Process(input, output, export_name, extensions, pattern_index):
+def Revit_Process(input, output, extensions, pattern_index):
 	# input= 'F:\PCG\pixyz\RVT_Scenario\_input'
 	# output = 'F:\PCG\pixyz\RVT_Scenario\_output'
 
@@ -41,6 +41,7 @@ def Revit_Process(input, output, export_name, extensions, pattern_index):
 	print('------------------')
 	print(b_isValid)
 	print('------------------ \n')
+
 	if b_isValid:
 		fl, k, w = getALL(input_folder)
 		for f in fl:
@@ -49,42 +50,55 @@ def Revit_Process(input, output, export_name, extensions, pattern_index):
 					# prepare to import all files in this directory
 					models_to_import = f.get(_k)
 					isImported = False
-					print(models_to_import)
 					RVT_id, RVT_name, RVT_code = getInfoFromFile(models_to_import[0], pattern_index)
 					_output_folder = output_folder / str(RVT_id) / str(RVT_code)
 					if not _output_folder.exists():
-						_output_folder.mkdir()
+						_output_folder.mkdir(parents=True)
+					_export_name = f'{RVT_name}_{RVT_code}'
 					print('current output folder is:' + str(_output_folder))
+					print('current export name is:' + _export_name)
+
 					# set log file path
 					log_path = _output_folder / 'pixyz.log'
 					core.setLogFile(str(log_path))
 
 					# import all files in this directory
 					for _model in models_to_import:
-						# execute importing
+						# execute importing and get the isImported status
 						isImported = advanced_imported_scene([_model], RVT_code, pattern_index)
-
-					if not export_name:
-						export_name = f'{RVT_name}_{RVT_code}'
 					print('===========importing finished============')
 
+					# export if imported successfully
 					_conditions = [isImported, not DebugMode]
 					if all(_conditions):
-
 						# after import then execute to export
-						advanced_export(_output_folder, export_name, extensions)
+						advanced_export(_output_folder, _export_name, extensions)
 						print('===========exporting finished============')
-						get_logo(3)
+
+					# reset session for next importing
+					get_logo(3)
 					core.resetSession()
 	else:
 		print('===========file is in valid============')
 		get_logo(2)
 		return
 
+
 # core.message("\n Revit_Process finished \n")
 
 
 def advanced_imported_scene(files_to_import, RVT_code, pattern_index):
+	"""
+	 Do importing and optimizing based on the RVT_code and pattern_index
+	:param files_to_import: list of files to import
+	:param RVT_code: RVT_code
+	:param pattern_index: pattern_index
+	:return: isImported to know if the importing is successful
+	"""
+	n_triangles = 0
+	n_vertices = 0
+	n_parts = 0
+	t0 = time.time()
 	try:
 		for file in files_to_import:
 			# 0. get current_RootOccurrence
@@ -96,7 +110,10 @@ def advanced_imported_scene(files_to_import, RVT_code, pattern_index):
 				pxz.process.ImportOptions(
 					False, True, True), False, False, False, False, False,
 				False)
-			t0, n_triangles, n_vertices, n_parts = getStats(current_RootOccurence[0])
+			t_local, n_triangles_local, n_vertices_local, n_parts_local = getStats(current_RootOccurence[0])
+			n_triangles += n_triangles_local
+			n_vertices += n_vertices_local
+			n_parts += n_parts_local
 			removeAllVerbose()
 			##########################################
 			# 1. prepare and merging
@@ -111,14 +128,16 @@ def advanced_imported_scene(files_to_import, RVT_code, pattern_index):
 			##########################################
 			# ? temperately make merging_mode=pattern_index
 			optimization_RVT(current_RootOccurence, RVT_code, merging_mode=pattern_index)
-			##########################################
-			t1, _n_triangles, _n_vertices, _n_parts = getStats(current_RootOccurence[0])
-			addAllVerbose()
-			FileName = scene.getNodeName(current_RootOccurence[0])
-			printStats(
-				FileName, t1 - t0, n_triangles, _n_triangles,
-				n_vertices, _n_vertices, n_parts, _n_parts)
+		##########################################
+
+		t1, _n_triangles, _n_vertices, _n_parts = getStats(scene.getRoot())
+
 		scene.deleteEmptyOccurrences()  # default occ = 0
+		addAllVerbose()
+		title_name = 'Status log : \r\n what we did in this file: \r\n'
+		printStats(
+			title_name, t1 - t0, n_triangles, _n_triangles,
+			n_vertices, _n_vertices, n_parts, _n_parts)
 		return True
 	except PermissionError as e:
 		if "Permission denied" in str(e):
@@ -189,11 +208,11 @@ def advanced_export(output_folder, export_name, extensions):
 	part_occurrences = scene.getPartOccurrences(scene.getRoot())
 	serializeMetadataToJSON(Part_Occurrences=part_occurrences, output_folder=output_folder)
 	# Export files
-	if not os.path.exists(output_folder):
-		os.makedirs(output_folder)
+	# if not os.path.exists(output_folder):
+	# 	os.makedirs(output_folder)
 	addAllVerbose()
 	print(
-		f'output_folder is {output_folder} \r\n export_name is {export_name}\r\n')
+		f'output_folder is {output_folder} \r\nexport_name is {export_name}\r\n')
 	for extension in extensions:
 		fileName = output_folder / (export_name + extension)
 		try:
@@ -216,7 +235,7 @@ def getStats(root):
 	n_vertices = scene.getVertexCount([root], False, False, False)
 	n_parts = len(scene.getPartOccurrences(root))
 
-	core.configureInterfaceLogger(True, True, True)  # reenable logs
+	core.configureInterfaceLogger(True, True, True)  # reasonable logs
 
 	return t, n_triangles, n_vertices, n_parts
 

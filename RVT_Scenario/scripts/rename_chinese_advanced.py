@@ -49,5 +49,5 @@ def main(target_dir):
 
 
 if __name__ == '__main__':
-    for i in range(2):
-        main(r'F:\PCG\pixyz\RVT_Scenario\_input')
+
+    main(r'F:\PCG\pixyz\RVT_Scenario\_input')

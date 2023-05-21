@@ -16,7 +16,25 @@
 *.mp4
 
 *.rvt
+*.rfa
 
-/_input/
-/_output/
+# except for these input or output files
+*.bin
+*.json
+*.xml
+*.csv
+*.gltf
+*.glb
+*.fbx
+*.obj
+*.mtl
+*.pxzext
+*.log
+*.exe
+*.pxz
 
+test*.py
+
+
+/RVT_Scenario/_output/
+/RVT_Scenario/_input/

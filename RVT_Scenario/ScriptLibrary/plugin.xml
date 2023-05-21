@@ -10,7 +10,6 @@
     <parameters>
       <parameter name="input" type="DirectoryPath" state="Stable"/>
       <parameter name="output" type="OutputDirectoryPath" state="Stable"/>
-      <parameter name="export_name" type="String" state="Stable"/>
       <parameter name="extensions" type="StringList" optional="true" default="[&quot;.fbx&quot;, &quot;.gltf&quot;]" state="Stable"/>
       <parameter name="pattern_index" type="Int" state="Stable"/>
     </parameters>

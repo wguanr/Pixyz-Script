@@ -114,7 +114,9 @@ def getInfoFromFile(file_path, pattern_index):
 		rvt_name = re_match_obj.group(2)
 		rvt_code = re_match_obj.group(3)
 	elif pattern_index == 1:
-		rvt_id = 8888  # set the default rvt_id as 4 numbers
+		# set id to current system date
+		system_date = os.popen('date /t').read()
+		rvt_id = str(system_date).replace('/', ' ').replace('\n', '')
 		rvt_name = re_match_obj.group(1)
 		rvt_code = re_match_obj.group(2)
 	else:
