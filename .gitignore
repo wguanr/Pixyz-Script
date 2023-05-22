@@ -15,26 +15,27 @@
 *.exe
 *.mp4
 
-*.rvt
-*.rfa
+#*.rvt
+#*.rfa
 
 # except for these input or output files
-*.bin
-*.json
-*.xml
-*.csv
-*.gltf
-*.glb
-*.fbx
-*.obj
-*.mtl
-*.pxzext
-*.log
-*.exe
-*.pxz
+#*.bin
+#*.json
+#*.xml
+#*.csv
+#*.gltf
+#*.glb
+#*.fbx
+#*.obj
+#*.mtl
+#*.pxzext
+#*.log
+#*.exe
+#*.pxz
 
 test*.py
-
-
+#
+#
 /RVT_Scenario/_output/
 /RVT_Scenario/_input/
+

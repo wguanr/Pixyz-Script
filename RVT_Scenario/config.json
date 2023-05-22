@@ -1,5 +1,5 @@
 {
-    "input_folder": "_input/",
+    "input_folder": "_input",
     "current_pattern_index": 1,
     "extensions": [
         ".fbx",

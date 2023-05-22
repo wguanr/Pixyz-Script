@@ -14,7 +14,7 @@ def clean():
 def final_optimize():
 	scene.mergeFinalLevel([1], 2, True)
 	algo.createInstancesBySimilarity(
-		[1], dimensionsSimilarity=0.98, polycountSimilarity=0.90,
+		[1], dimensionsSimilarity=0.98, polycountSimilarity=0.95,
 		ignoreSymmetry=True, keepExistingPrototypes=True, createNewOccurrencesForPrototypes=True)
 	algo.triangularize([1])
 	# algo.removeDegeneratedPolygons([1], 50)

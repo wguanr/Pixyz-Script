@@ -19,42 +19,22 @@ pattern_0 = {
 # e.g. 40012334_建筑_A_F01
 
 
-def isCopyFinished(inputFile):
-	"""
-	Check if the file that was dropped in the input folder has finished being copied
-	"""
-	GENERIC_WRITE = 1 << 30
-	FILE_SHARE_READ = 0x00000001
-	OPEN_EXISTING = 3
-	FILE_ATTRIBUTE_NORMAL = 0x80
-	handle = windll.Kernel32.CreateFileW(
-		inputFile, GENERIC_WRITE, FILE_SHARE_READ, None, OPEN_EXISTING,
-		FILE_ATTRIBUTE_NORMAL, None)
-	if handle != -1:
-		windll.Kernel32.CloseHandle(handle)
-		return True
-	return False
-
-
 #	return filelist_from_rootFolder, keys, waiting
 def getALL(input_folder):
 	# initialize a dictionary list to store the target files
 	filelist_from_rootFolder = []
 	keys = []
-	waiting = False
 	for root, dirs, files in os.walk(input_folder):
 		if not dirs:
-			_key = root.split('\\')[-1]
+			root = pl.Path(root)
+			_key = root.relative_to(input_folder)
+			_key = str(_key)
 			keys.append(_key)
-			# print(_key)
-			filepaths = [root + '/' + file for file in files]
+			filepaths = [root / file for file in files]
 			target_files_dic = {_key: filepaths}
 			# 有效的输入和输出文件夹路径在这里定义
-			print(root)
-			print(files)
 			filelist_from_rootFolder.append(target_files_dic)
-
-	return filelist_from_rootFolder, keys, waiting
+	return filelist_from_rootFolder, keys
 
 
 def isValid(input_folder, pattern_index) -> bool:
@@ -66,7 +46,7 @@ def isValid(input_folder, pattern_index) -> bool:
 	valid_extensions = [".rvt", ".rfa"]
 
 	# get all files to import
-	fs, ks, bw = getALL(input_folder)
+	fs, ks = getALL(input_folder)
 	for f in fs:
 		for mdoel_group in ks:
 			target_models_to_import = []
@@ -91,6 +71,7 @@ def isValid(input_folder, pattern_index) -> bool:
 				match = re.search(pattern_0.get(pattern_index), FileName)
 
 				if not bool(match):
+					print("Error file is : " + FileName + " , please check the file name.")
 					return False
 
 	return True
@@ -116,7 +97,9 @@ def getInfoFromFile(file_path, pattern_index):
 	elif pattern_index == 1:
 		# set id to current system date
 		system_date = os.popen('date /t').read()
-		rvt_id = str(system_date).replace('/', ' ').replace('\n', '')
+		rvt_id = str(system_date).replace('/', '_').replace('\n', '')
+		# delete last 2 chars
+		rvt_id = rvt_id[:-4]
 		rvt_name = re_match_obj.group(1)
 		rvt_code = re_match_obj.group(2)
 	else:
@@ -124,18 +107,45 @@ def getInfoFromFile(file_path, pattern_index):
 
 	return rvt_id, rvt_name, rvt_code
 
-# #
+
+
+def isCopyFinished(inputFile):
+	"""
+	Check if the file that was dropped in the input folder has finished being copied
+	"""
+	GENERIC_WRITE = 1 << 30
+	FILE_SHARE_READ = 0x00000001
+	OPEN_EXISTING = 3
+	FILE_ATTRIBUTE_NORMAL = 0x80
+	handle = windll.Kernel32.CreateFileW(
+		inputFile, GENERIC_WRITE, FILE_SHARE_READ, None, OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL, None)
+	if handle != -1:
+		windll.Kernel32.CloseHandle(handle)
+		return True
+	return False
+
+#
+# # # #
 # if __name__ == '__main__':
-# 	input_folder = 'F:\PCG\pixyz\RVT_Scenario\_input'
-# 	fl, k, w = getALL(input_folder)
+# 	input_folder = r'F:\PCG\pixyz\RVT_Scenario\_input'
+# 	fl, k = getALL(input_folder)
 # 	input_folder = pl.Path(input_folder)
 # 	isValid = isValid(input_folder, 1)
+# 	output_folder = pl.Path(r'F:\PCG\pixyz\RVT_Scenario\_output')
 # 	print(isValid)
+# 	print(k)
 # 	for f in fl:
 # 		for _k in k:
 # 			if f.get(_k):
 # 				print(_k, f.get(_k))
 # 				models_to_import = f.get(_k)
+# 				rvt_id, rvt_name, rvt_code = getInfoFromFile(models_to_import[0], 1)
+# 				# print(rvt_id, rvt_name, rvt_code)
+# 				_output_folder = output_folder / str(rvt_id) /str(_k)/str(rvt_code)
+# 				_output_folder.mkdir(parents=True, exist_ok=True)
+# 				_export_name = f'ID_{rvt_id}_{rvt_code}'
+# 				print('current output folder is:' + str(_output_folder))
+# 				print('current export basename is:' + _export_name)
 # 				for _model in models_to_import:
-# 					rvt_id, rvt_name, rvt_code = getInfoFromFile(_model, 1)
-# 					print(rvt_id, rvt_name, rvt_code)
+# 					pass

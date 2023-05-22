@@ -28,52 +28,59 @@ class GetParameters:
 #  core.setInteractiveMode(True)
 #  core.checkLicense()
 
-def Revit_Process(input, output, extensions, pattern_index):
-	# input= 'F:\PCG\pixyz\RVT_Scenario\_input'
+def Revit_Process(input, extensions, pattern_index):
+	# input= r'F:\PCG\pixyz\RVT_Scenario\_input\2023nianzuixin0302dikuairevitmoxing\muqiangmoxing'
 	# output = 'F:\PCG\pixyz\RVT_Scenario\_output'
+	if not os.path.exists(input):
+		print('Revit_Process input is not a valid path')
+		return
 
 	input_folder = ph.Path(input)
-	output_folder = ph.Path(output)
-
+	output_folder = ph.Path(input).parent / '_output'
+	output_folder.mkdir(parents=True, exist_ok=True)
+	# print('current input folder is:' + str(input_folder))
 	get_logo(1)
 	b_isValid = isValid(input_folder, pattern_index)
+	print('\n------------------ ')
 	print('file check result:')
-	print('------------------')
 	print(b_isValid)
 	print('------------------ \n')
 
+	# b_isValid = False
 	if b_isValid:
-		fl, k, w = getALL(input_folder)
+		fl, k = getALL(input_folder)
 		for f in fl:
 			for _k in k:
 				if f.get(_k):
 					# prepare to import all files in this directory
 					models_to_import = f.get(_k)
-					isImported = False
-					RVT_id, RVT_name, RVT_code = getInfoFromFile(models_to_import[0], pattern_index)
-					_output_folder = output_folder / str(RVT_id) / str(RVT_code)
-					if not _output_folder.exists():
-						_output_folder.mkdir(parents=True)
-					_export_name = f'{RVT_name}_{RVT_code}'
+					print('models  ' + str(models_to_import))
+					RVT_id, RVT_name, RVT_code = getInfoFromFile(models_to_import[0], 1)
+					# print(rvt_id, rvt_name, rvt_code)
+					_output_folder = output_folder / str(RVT_id) / str(_k) / str(RVT_code)
+					_output_folder.mkdir(parents=True, exist_ok=True)
+					_export_name = f'ID_{RVT_id}_{RVT_code}'
 					print('current output folder is:' + str(_output_folder))
-					print('current export name is:' + _export_name)
-
+					print('current export basename is:' + _export_name)
 					# set log file path
 					log_path = _output_folder / 'pixyz.log'
 					core.setLogFile(str(log_path))
 
 					# import all files in this directory
+					print('===========importing now ============\n')
+					import_list = []
 					for _model in models_to_import:
-						# execute importing and get the isImported status
-						isImported = advanced_imported_scene([_model], RVT_code, pattern_index)
-					print('===========importing finished============')
+						import_list.append(str(_model))
+					print(import_list)
+					isImported = advanced_imported_scene(import_list, RVT_code, pattern_index)
+					print('===========importing finished============\n')
 
 					# export if imported successfully
 					_conditions = [isImported, not DebugMode]
 					if all(_conditions):
 						# after import then execute to export
 						advanced_export(_output_folder, _export_name, extensions)
-						print('===========exporting finished============')
+						print('===========exporting finished============\n')
 
 					# reset session for next importing
 					get_logo(3)
@@ -90,47 +97,40 @@ def Revit_Process(input, output, extensions, pattern_index):
 def advanced_imported_scene(files_to_import, RVT_code, pattern_index):
 	"""
 	 Do importing and optimizing based on the RVT_code and pattern_index
-	:param files_to_import: list of files to import
+	:param files_to_import: list of file paths to import
 	:param RVT_code: RVT_code
 	:param pattern_index: pattern_index
 	:return: isImported to know if the importing is successful
 	"""
-	n_triangles = 0
-	n_vertices = 0
-	n_parts = 0
-	t0 = time.time()
+
 	try:
-		for file in files_to_import:
-			# 0. get current_RootOccurrence
-			current_RootOccurence = process.guidedImport(
-				[str(file)], pxz.process.CoordinateSystemOptions(
-					["automaticOrientation", 0],
-					["automaticScale", 0], False,
-					False), ["usePreset", 2],
-				pxz.process.ImportOptions(
-					False, True, True), False, False, False, False, False,
-				False)
-			t_local, n_triangles_local, n_vertices_local, n_parts_local = getStats(current_RootOccurence[0])
-			n_triangles += n_triangles_local
-			n_vertices += n_vertices_local
-			n_parts += n_parts_local
-			removeAllVerbose()
+		process.guidedImport(files_to_import, pxz.process.CoordinateSystemOptions(
+				["automaticOrientation", 0],
+				["automaticScale", 0], False,
+				False), ["usePreset", 2],
+			pxz.process.ImportOptions(
+				False, True, True), False, False, False, False, False,
+			False)
+		t0, n_triangles, n_vertices, n_parts = getStats(1)
+
+		removeAllVerbose()
 			##########################################
 			# 1. prepare and merging
 			##########################################
-			clean()
-			clean_filtered_occurrences(GetParameters.RVT_delete_byName)
-			clean_materials(current_RootOccurence)
-			scene.mergePartsByAssemblies([1], 2)
+		clean()
+		clean_filtered_occurrences(GetParameters.RVT_delete_byName)
+		clean_materials([1])
+		scene.mergePartsByAssemblies([1], 2)
 
-			##########################################
-			# 2. main optimization
-			##########################################
-			# ? temperately make merging_mode=pattern_index
-			optimization_RVT(current_RootOccurence, RVT_code, merging_mode=pattern_index)
+		##########################################
+		# 2. main optimization
+		##########################################
+		# ? temperately make merging_mode=pattern_index
+		for _occ in scene.getChildren(1):
+			optimization_RVT([_occ], RVT_code, merging_mode=pattern_index)
 		##########################################
 
-		t1, _n_triangles, _n_vertices, _n_parts = getStats(scene.getRoot())
+		t1, _n_triangles, _n_vertices, _n_parts = getStats(1)
 
 		scene.deleteEmptyOccurrences()  # default occ = 0
 		addAllVerbose()
@@ -184,6 +184,7 @@ def optimization_RVT(current_RootOccurrence, RVT_code, merging_mode):
 
 	scene.deleteEmptyOccurrences()
 	scene.mergeFinalLevel(current_RootOccurrence, 2, True)  # so that to make instances
+	scene.resetPartTransform(1)
 	##########################################
 	# General: repair and decimate
 	##########################################

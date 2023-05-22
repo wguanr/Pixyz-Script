@@ -3,24 +3,44 @@ import json
 import os
 import subprocess
 from rename_chinese_advanced import main as rn
+import pathlib as plb
 
 
 def main(config_file):
-	# 暂时不输出output_foloder
-	input_folder, extensions, current_pattern_index = read_config(config_file)
-	output_folder = input_folder.replace("input", "output")
-	if not os.path.exists(output_folder):
-		os.mkdir(output_folder)
-
+	# Read config file
+	with open(config_file) as config:
+		inputs = json.load(config)
+	input_folder = inputs['input_folder']
+	input_folder = os.path.abspath(input_folder)
+	extensions = inputs['extensions']
+	current_pattern_index = inputs['current_pattern_index']
+	# rename chinese
 	rn(input_folder)
-	print('Input folder: ' + input_folder)
-	print('Output folder: ' + output_folder)
+	print('\n')
+	print('Input folder: ' + str(input_folder))
 	print('Output extensions: ' + str(extensions))
-	process_revit_files(
-		input_folder, output_folder, extensions=str(extensions),
-		pattern_index=current_pattern_index)
+	print('Current pattern index: ' + str(current_pattern_index))
+	print('\n')
 
+	args = [r'C:\Program Files\PiXYZScenarioProcessor\PiXYZScenarioProcessor.exe',
+	        'ScriptLibrary',
+	        'Revit_Process',
+	        f'"{input_folder}"',
+	        str(extensions),
+	        str(current_pattern_index)]
+
+	# there has to ignite  encoding='utf-8' to avoid error
+	p = subprocess.Popen(
+		args, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf-8')
+
+	# read output line by line
+	for line in p.stdout:
+		print(line.strip())
+	sys.stdout.flush()
+
+	print('\n')
 	print('Done: Revit_Process executed')
+	print('\n')
 
 
 #
@@ -31,24 +51,6 @@ def main(config_file):
 # 	for dir in dirs:
 # 		os.rmdir(os.path.join(root, dir))
 # print('Reset: Input folder cleared')
-
-
-def process_revit_files(input_folder, output_folder, extensions, pattern_index):
-	args = [r'C:\Program Files\PiXYZScenarioProcessor\PiXYZScenarioProcessor.exe',
-	        'ScriptLibrary',
-	        'Revit_Process',
-	        f'"{input_folder}"',
-	        f'"{output_folder}"',
-	        str(extensions),
-	        str(pattern_index)]
-
-	# there has to ignite  encoding='utf-8' to avoid error
-	p = subprocess.Popen(
-		args, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,encoding='utf-8')
-
-	# read output line by line
-	for line in p.stdout:
-		print(line, end='')
 
 
 def read_config(config_file):

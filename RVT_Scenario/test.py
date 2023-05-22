@@ -1,11 +1,13 @@
 import pathlib as pl
 import os
 
-
-input_folder = 'F:\PCG\pixyz\RVT_Scenario\_input'
+input_folder = r'F:\PCG\pixyz\RVT_Scenario\_input\2023nianzuixin0302dikuairevitmoxing'
 input_folder2 = r'E:\CIM_RVT\4403050020063700015_前海法治大厦'
 
-input = pl.Path(input_folder2)
+input = pl.Path(input_folder)
+input = input.parent
+output = pl.Path(input)
+print(output)
 
 # get directories as tree from the input_folder
 def getALL(input_folder):
@@ -33,5 +35,16 @@ def getALL(input_folder):
 	return files_list, keys_list, warnings_list
 
 
-a,b,c = getALL(input)
-print(a[0],b[0],c)
+# pathlist = [r"F:\PCG\pixyz\RVT_Scenario\_input\2023nianzuixin0302dikuairevitmoxing\jianzhumoxing\talou\塔楼T1_AR.rvt", r"F:\PCG\pixyz\RVT_Scenario\_input\2023nianzuixin0302dikuairevitmoxing\jianzhumoxing\talou\塔楼T2_AR.rvt"]
+# current_RootOccurence = process.guidedImport(
+# 	pathlist, pxz.process.CoordinateSystemOptions(
+# 		["automaticOrientation", 0],
+# 		["automaticScale", 0], False,
+# 		False), ["usePreset", 2],
+# 	pxz.process.ImportOptions(
+# 		False, True, True), False, False, False, False, False,
+# 	False)
+#
+#
+# print(len(current_RootOccurence))
+# print("current_RootOccurence" + str(current_RootOccurence))
