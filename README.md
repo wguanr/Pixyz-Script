@@ -1,26 +1,33 @@
-# PIXYZ System Lab
+
+![building Equipments.png](Documentation%2Fbuilding%20Equipments.png)
+
+# - PIXYZ System -
 
 *MyAutomation1 used for Pixyz*
 *版本：20230417 实现   PIXYZ 2022.1*
 
-![logo_WK.png](Documentation%2Flogo_WK.png)
-
-# Release Notes & Roadmap
+## Release Notes & Roadmap
 RVT是很标准的，考虑基于此进行开发
 在PIXYZ 2021版本之后，导入时默认执行一轮优化策略。一些脚本其实已经没啥用了。未来的目标是基于某一类的模型进行定制化的优化。
 另一方面，自从Pixyz被Unity收购之后，各种试用版的限制越来越多，不知道未来会怎么样。所以，这个项目也是为了自己的学习和研究。仅作为一个可行技术路径的探索。
-### 3.1 updates
+### Roadmap
 
-`处理中`
+* WIP
+* [ ] *Pixyz的bug太多了。不想搞了。有一个拉起subprogress的bug，时不时地无法识别GBK字符或者无法正确转utf-8码。如果你是全英文半角的.rvt文件，应该不会有任何问题。后续交给老哥用fme走吧。我要去继续研究UE了。*
+* [x] 解决实例Transform没有归零的问题。
+  * 也可以通过ue脚本来实现。
+* [ ] 添加交互式的UI界面，可以选择导入导出的文件夹，以及导入导出的格式。
+* [x] 优化导入导出的流程，提升效率。
 
-
-`已解决`
-
-- bug：解决中文字符转拼音的问题
+---
+* [x] 应当剥离和名称相关的逻辑，这样在处理不规范模型的时候，也可以使用现有算法
+  - 添加了一个新的脚本，用于处理名称相关的逻辑
+* [x] 实例化ResetTransform时的变形问题
+* [x] bug：解决中文字符转拼音的问题
   - 提供了批量化命名的脚本，转化拼音
   - 2023年4月23日 .pxzext更新后，可以识别中文字符了
-- 升级：实现多文件夹监控和递归查询文件，梳理IO层级
-- UE datasmith 无法识别 fbx 层级结构附带属性的问题。只有SMActor才有AssetUserData。
+* [x] 升级：实现多文件夹监控和递归查询文件，梳理IO层级
+* [x] UE datasmith 无法识别 fbx 层级结构附带属性的问题。只有SMActor才有AssetUserData。
     - 通过JSON库来导出metadata，进行数模分离
 
 
@@ -93,3 +100,4 @@ RVT是很标准的，考虑基于此进行开发
 21. RVT 参考了深圳市的标准文件。基于此进行了测试。
 
 
+![logo_WK.png](Documentation%2Flogo_WK.png)

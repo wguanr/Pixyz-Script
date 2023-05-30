@@ -7,6 +7,35 @@
 *.zip
 *.7z
 *.rar
+*.fbx
+*.obj
+*.mtl
+*.pxzext
+*.log
+*.exe
+*.mp4
 
-/RVT_Scenario/_input/
+#*.rvt
+#*.rfa
+
+# except for these input or output files
+#*.bin
+#*.json
+#*.xml
+#*.csv
+#*.gltf
+#*.glb
+#*.fbx
+#*.obj
+#*.mtl
+#*.pxzext
+#*.log
+#*.exe
+#*.pxz
+
+test*.py
+#
+#
 /RVT_Scenario/_output/
+/RVT_Scenario/_input/
+

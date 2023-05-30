@@ -1,9 +1,15 @@
 {
-    "input_folder": "_input/",
-    "output_folder": "_output/",
-    "output_custom_name": "",
+    "StandardMode": false,
+    "input_folder": "F:\\PCG\\pixyz\\RVT_Scenario\\_input\\test",
+    "current_pattern_index": 1,
+    "project_name": "xxxxx",
+    "rvt_code_dict": {
+        "建筑": "AR",
+        "结构": "ST",
+        "幕墙": "A",
+        "机电": "MEP"
+    },
     "extensions": [
-        ".pxz",
         ".fbx",
         ".gltf"
     ]
