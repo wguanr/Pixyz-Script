@@ -3,32 +3,11 @@ max_Occurrence_Name = 64
 
 
 def clean():
-	# global, called muti time.
+	# global, could be called muti time.
 	scene.cleanUnusedMaterials(True)
 	scene.deleteEmptyOccurrences()
 	scene.renameLongOccurrenceName(64)
 	scene.removeUselessInstances(1)
-
-
-# after deleting and merging
-def final_optimize():
-	scene.mergeFinalLevel([1], 2, True)
-	algo.createInstancesBySimilarity(
-		[1], dimensionsSimilarity=0.98, polycountSimilarity=0.95,
-		ignoreSymmetry=True, keepExistingPrototypes=True, createNewOccurrencesForPrototypes=True)
-	algo.triangularize([1])
-	# algo.removeDegeneratedPolygons([1], 50)
-	algo.optimizeForRendering([1])
-	print("Final optimized with instances")
-
-
-# deprecate!!!!!
-def find_occurrences(DeletedOrMerged):
-	if DeletedOrMerged:
-		occs = scene.getFilteredOccurrences(filter_exprs.RVT_deleted_expr)
-	else:
-		occs = scene.getFilteredOccurrences(filter_exprs.RVT_merged_expr)
-	return occs
 
 
 def clean_filtered_occurrences(FilterExpression):
@@ -37,8 +16,8 @@ def clean_filtered_occurrences(FilterExpression):
 		scene.deleteComponentsByType(2, [1])
 		return True
 	except:
-		return False
 		print("nothing returned")
+		return False
 
 
 def clean_materials(Target_Occurrences):

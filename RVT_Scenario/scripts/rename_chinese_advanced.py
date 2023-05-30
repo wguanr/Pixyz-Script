@@ -38,11 +38,18 @@ def main(target_dir):
                     old_path = os.path.join(root, file)
                     new_path = os.path.join(root, new_name)
                     os.rename(old_path, new_path)
-        print('prepare: Renaming finished\n')
+                    print('prepare: Renaming finished\n')
+                if '幕墙' in file:
+                    new_name = file.replace('幕墙', 'A')
+                    old_path = os.path.join(root, file)
+                    new_path = os.path.join(root, new_name)
+                    os.rename(old_path, new_path)
+                    print('prepare: Renaming finished\n')
+
     except Exception as e:
         print(e)
 
 
 if __name__ == '__main__':
-
-    main(r'F:\PCG\pixyz\RVT_Scenario\_input')
+    for i in range(1, 11):
+        main(r'F:\PCG\pixyz\RVT_Scenario\_input')

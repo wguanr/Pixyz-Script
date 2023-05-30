@@ -1,16 +1,15 @@
 
 # main fuc
 def model_factor(ModelPreset) -> float:
+    """
+    :param ModelPreset: VeryHigh = 0; High = 1; Medium = 2; Low = 3
+    """
     # if ModelPreset:
-    # VeryHigh = 0
-    # High = 1
-    # Medium = 2
-    # Low = 3
-    # origin = nothing
+    #
     model_PrecisionFactor = {
         process.QualityPreset.Low: 50.0,
-        process.QualityPreset.Medium: 15.0,
-        process.QualityPreset.High: 2.5,
+        process.QualityPreset.Medium: 20.0,
+        process.QualityPreset.High: 4,
         process.QualityPreset.VeryHigh: 0.5,
     }
     return model_PrecisionFactor.get(ModelPreset, 0)

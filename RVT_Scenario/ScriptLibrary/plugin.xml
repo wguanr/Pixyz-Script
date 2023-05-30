@@ -6,18 +6,13 @@
   <include module="Material"/>
   <include module="Process"/>
   <include module="Scene"/>
-  <function name="Revit_Process" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="ScriptLibrary.py">
-    <parameters>
-      <parameter name="input" type="DirectoryPath" state="Stable"/>
-      <parameter name="extensions" type="StringList" state="Stable"/>
-      <parameter name="pattern_index" type="Int" state="Stable"/>
-    </parameters>
-  </function>
-  <function name="advanced_imported_scene" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="ScriptLibrary.py">
+  <function name="RevitGeneralProcess" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="ScriptLibrary.py">
     <parameters>
       <parameter name="files_to_import" type="FilePathList" state="Stable"/>
-      <parameter name="RVT_code" type="String" state="Stable"/>
-      <parameter name="pattern_index" type="Int" state="Stable"/>
+      <parameter name="output_folder" type="DirectoryPath" state="Stable"/>
+      <parameter name="export_name" type="String" state="Stable"/>
+      <parameter name="extensions" type="StringList" state="Stable"/>
+      <parameter name="key_of_files" type="String" state="Stable"/>
     </parameters>
   </function>
   <function name="clean" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py"/>
@@ -30,24 +25,6 @@
     <parameters>
       <parameter name="Target_Occurrence" type="OccurrenceList" state="Stable"/>
       <parameter name="Model_Quality" type="QualityPreset" state="Stable"/>
-    </parameters>
-  </function>
-  <function name="final_optimize" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py"/>
-  <function name="getALL" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="LocalSuperviser.py">
-    <parameters>
-      <parameter name="input_folder" type="DirectoryPath" state="Stable"/>
-    </parameters>
-  </function>
-  <function name="getInfoFromFile" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="LocalSuperviser.py">
-    <parameters>
-      <parameter name="file_path" type="FilePath" state="Stable"/>
-      <parameter name="pattern_index" type="Int" state="Stable"/>
-    </parameters>
-  </function>
-  <function name="isValid" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="LocalSuperviser.py">
-    <parameters>
-      <parameter name="input_folder" type="DirectoryPath" state="Stable"/>
-      <parameter name="pattern_index" type="Int" state="Stable"/>
     </parameters>
   </function>
   <function name="repairing" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
