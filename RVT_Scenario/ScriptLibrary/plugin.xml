@@ -50,4 +50,16 @@
       <parameter name="Model_Quality" type="QualityPreset" state="Stable"/>
     </parameters>
   </function>
+  <function name="serializeMetadataToJSON" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="Serializations.py">
+    <parameters>
+      <parameter name="Occurrences" type="OccurrenceList" state="Stable"/>
+      <parameter name="JSON_dir" type="String" state="Stable"/>
+      <parameter name="json_add_mode" type="Bool" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="StandardSerialization" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="Serializations.py">
+    <parameters>
+      <parameter name="output_folder" type="String" state="Stable"/>
+    </parameters>
+  </function>
 </module>
