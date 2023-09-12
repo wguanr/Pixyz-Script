@@ -36,7 +36,7 @@ class GetParameters:
 #  core.choose("message", values, 0)
 #  core.setInteractiveMode(True)
 #  core.checkLicense()
-def RevitInFME(input_path, output_path, DimensionsSimilarity, PolycountSimilarity, RVT_uniform_code):
+def RevitInFME(input_path, output_dir, output_filename, DimensionsSimilarity, PolycountSimilarity):
 
 	output_path = ph.Path(str(output_path))
 	output_folder = output_path.parent
@@ -57,32 +57,20 @@ def RevitInFME(input_path, output_path, DimensionsSimilarity, PolycountSimilarit
 	# print(f'RVT_uniform_code is {RVT_uniform_code}\r\n')
 	print(f'import_list is {import_list}\r\n')
 
-	print('===========importing parameters============\n')
-
-	isImported = advanced_imported_scene_FME(import_list, RVT_uniform_code, DimensionsSimilarity, PolycountSimilarity)
-
-	print('===========importing finished============\n')
+	isImported = advanced_imported_scene_FME(import_list, DimensionsSimilarity, PolycountSimilarity)
 
 	# export if imported successfully
 	_conditions = [isImported, not DebugMode]
 	if all(_conditions):
 		# after import then execute to export
 		advanced_export(output_folder, export_name, output_extension)
-		print('===========exporting finished============\n')
 		core.resetSession()
 	# reset session for next importing
 	get_logo(3)
 
 
 def RevitGeneralProcess(files_to_import, output_folder, export_name, extensions, key_of_files):
-	"""
-	Do importing and exporting based on the RVT_uniform_code and pattern_index
-	:param files_to_import: list of files to import
-	:param output_folder: folder directory to export
-	:param export_name: file basename of the export file
-	:param extensions: file extension of the export file
-	:param key_of_files: string name
-	"""
+
 	OptimizeMode = 1
 
 	output_folder = ph.Path(str(output_folder))
@@ -107,15 +95,7 @@ def RevitGeneralProcess(files_to_import, output_folder, export_name, extensions,
 	get_logo(3)
 
 
-def advanced_imported_scene_FME(import_list, RVT_uniform_code, DimensionsSimilarity, PolycountSimilarity):
-	"""
-	Do importing and optimizing based on the RVT_uniform_code and pattern_index
-	:param import_list: list of file paths to import
-	:param RVT_uniform_code: RVT_uniform_code
-	:param DimensionsSimilarity
-	:param PolycountSimilarity
-	:return: isImported to know if the importing is successful
-	"""
+def advanced_imported_scene_FME(import_list, DimensionsSimilarity, PolycountSimilarity):
 
 	try:
 		process.guidedImport(
@@ -179,13 +159,6 @@ def advanced_imported_scene_FME(import_list, RVT_uniform_code, DimensionsSimilar
 
 
 def advanced_imported_scene(OptimizeMode, files_to_import, RVT_uniform_code):
-	"""
-	 Do importing and optimizing based on the RVT_uniform_code and pattern_index
-	:param files_to_import: list of file paths to import
-	:param RVT_uniform_code: RVT_uniform_code
-	:param pattern_index: pattern_index
-	:return: isImported to know if the importing is successful
-	"""
 
 	try:
 		process.guidedImport(
@@ -240,11 +213,7 @@ def optimization_Preparation():
 
 
 def optimization_RVT(RVT_uniform_code, OptimizeMode):
-	"""
-	Do merging, repairing, decimating using Pixyz!
-	:param RVT_uniform_code: SS为钢结构，E为电气, P为管道, S为结构, M为机电, A为建筑, T为智能化
-	:param OptimizeMode: 0 for Standard, 1 for customize
-	"""
+
 	# 0: General Optimization
 	scene.resetPartTransform(1)
 	scene.mergeFinalLevel([1], 2, True)  # so that to make instances
@@ -252,14 +221,11 @@ def optimization_RVT(RVT_uniform_code, OptimizeMode):
 		[1], GetParameters.ISM_dimensions, GetParameters.ISM_polycount,
 		ignoreSymmetry=True, keepExistingPrototypes=False, createNewOccurrencesForPrototypes=True)
 
-	##########################################
-	# create current_RootOccurrence for each element, merged and prepare for instancing, remain generic models
-	##########################################
+
 	elmts = GetParameters.RVT_ElementsList_ISM + GetParameters.RVT_ElementsList_One
 	TargetOccurrence = scene.getChildren(1)
 	for occ in TargetOccurrence:
 		if OptimizeMode == 0:
-			# find by metadata
 			_count = 0
 			for i in elmts:
 				_count = _count + 1
@@ -271,7 +237,6 @@ def optimization_RVT(RVT_uniform_code, OptimizeMode):
 						scene.mergeParts([_occ1], 2)
 
 		elif OptimizeMode == 1:
-			# find by name property
 			occurrence_byFamily = scene.getFilteredOccurrences(GetParameters.RVT_merge_byName, 1)
 			for _occ in occurrence_byFamily:
 				scene.mergeParts([_occ], 2)
@@ -285,10 +250,7 @@ def optimization_RVT(RVT_uniform_code, OptimizeMode):
 
 
 def general_repair_and_decimate(RVT_uniform_code):
-	'''
-	:param RVT_uniform_code: SS为钢结构，E为电气, P为管道, S为结构, M为机电, A为建筑, T为智能化
-	:return:
-	'''
+
 	if RVT_uniform_code in ["结构", "总图", "钢结构", "电气", "市政"]:
 		repairing([1], 3)
 		decimating(1, 3)
@@ -298,10 +260,7 @@ def general_repair_and_decimate(RVT_uniform_code):
 
 
 def advanced_export(output_folder, export_name, extensions):
-	"""
-	Export the scene to the specified format.
 
-	"""
 	removeAllVerbose()
 
 	algo.triangularize([1])

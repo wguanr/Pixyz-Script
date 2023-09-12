@@ -4,6 +4,9 @@ import pathlib as phb
 
 
 ####
+version = 1.2
+
+
 # PropertyInfoList = core.listProperties(entity)
 # core.getProperties(entities, "propertyName", "")
 # core.hasProperty(entity, "propertyName")
@@ -46,13 +49,13 @@ def StandardSerialization(output_folder):
 
 # 在Pixyz的环境下执行
 # 递归查找每一个Occurrence，然后将其Metadata写入JSON文件
-def serializeMetadataToJSON(Occurrences, JSON_dir, json_add_mode):
+def serializeMetadataToJSON(OccurrenceList, JSON_dir, JSON_file_mode):
 	print('**************')
 	print('serializeMetadataToJSON Begin')
 	print('**************')
 
 	json_data = []
-	for Target_Occurrence in Occurrences:
+	for Target_Occurrence in OccurrenceList:
 		if not scene.hasComponent(Target_Occurrence, 5, True):
 			continue
 		print('Current_Occurrences is ', scene.getNodeName(Target_Occurrence))
@@ -75,7 +78,7 @@ def serializeMetadataToJSON(Occurrences, JSON_dir, json_add_mode):
 	json_data = list(json_data)  # 将集合转换为列表
 
 	JSON_path = os.path.join(JSON_dir, 'Metadata.json')
-	if not json_add_mode:
+	if not JSON_file_mode:
 
 		json_str = json.dumps(json_data, ensure_ascii=False, indent=4)
 		with open(JSON_path, 'w', encoding='utf-8') as f:
@@ -100,8 +103,6 @@ def serializeMetadataToJSON(Occurrences, JSON_dir, json_add_mode):
 			f.close()
 
 		return f
-
-
 
 
 def export_all_metadata_to_json_str():
