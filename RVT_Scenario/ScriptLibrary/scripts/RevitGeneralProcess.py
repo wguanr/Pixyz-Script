@@ -1,6 +1,5 @@
 import time
-import json
-import os
+
 import pathlib as ph
 import re
 
@@ -305,14 +304,12 @@ def advanced_export(output_folder, export_name, extensions):
 	"""
 	removeAllVerbose()
 
-	# Optimize for rendering
 	algo.triangularize([1])
 	algo.optimizeForRendering([1])
 
 	# Write metadata and rename nodes
-	part_occurrences = scene.getPartOccurrences(scene.getRoot())
 	addAllVerbose()
-	serializeMetadataToJSON(Part_Occurrences=part_occurrences, output_folder=output_folder)
+	StandardSerialization(output_folder)
 
 	get_logo(2)
 	print('Start exporting')
@@ -336,56 +333,6 @@ def getStats(root):
 	core.configureInterfaceLogger(True, True, True)  # reasonable logs
 
 	return t, n_triangles, n_vertices, n_parts
-
-
-# 在Pixyz的环境下执行
-# 递归查找每一个Occurrence，然后将其Metadata写入JSON文件
-def serializeMetadataToJSON(Part_Occurrences, output_folder):
-	# prepare
-	# make_unique_name, 为每一个Nodename添加ID
-	# 将JSON字符串写入文件
-	save_path = output_folder / 'Local_Metadata'
-	if not save_path.exists():
-		save_path.mkdir()
-	print('**************')
-	print('serializeMetadataToJSON Begin')
-	print('**************')
-
-	# 通过循环，将每一个Occurrence的Metadata写入JSON文件,并且去重
-	# 1. 字典推导式和update()避免多次循环构建字典,提高效率。
-	# 2. 合并步骤减少,避免创建临时变量。
-	# 3. 使用集合set自动去重,减少重复数据。
-	# 4. 使用列表转换保留数据顺序。
-	json_data = []
-	for Target_Occurence in Part_Occurrences:
-		print('Current_Occurrences is ', scene.getNodeName(Target_Occurence))
-		Metadata_Comp = scene.getComponentByOccurrence([Target_Occurence], 5, True)
-		Metadata_Defis = scene.getMetadatasDefinitions(Metadata_Comp)
-
-		json_data_metadata = {}
-		for Metadata_KeyValue in Metadata_Defis:
-			if not Metadata_KeyValue:
-				continue
-			_name = scene.getActivePropertyValue(Target_Occurence, "Name", True)
-			name_value = f'{_name}_{Target_Occurence}'
-			_NodeName = core.setProperty(Target_Occurence, "Name", name_value)
-			json_data_metadata.update({Metadata.name: Metadata.value for Metadata in Metadata_KeyValue})
-
-		NodeName = scene.getNodeName(Target_Occurence)
-		json_data.append(
-			{
-				'NodeName': NodeName,
-				**json_data_metadata
-				})
-
-	json_data = list(json_data)
-	json_str = json.dumps(json_data, ensure_ascii=False, indent=4)
-	# print(json_str)
-	with open(save_path / 'Metadata.json', 'w', encoding='utf-8') as f:
-		f.write(json_str)
-		f.write('\n')
-
-	return save_path
 
 
 def printStats(fileName, t, n_triangles, _n_triangles, n_vertices, _n_vertices, n_parts, _n_parts):
