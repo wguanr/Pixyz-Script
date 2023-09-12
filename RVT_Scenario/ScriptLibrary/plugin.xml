@@ -1,18 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<module name="ScriptLibrary" version="2022.1.1.4">
+<module name="DataProcessor" version="2022.1.1.4">
   <include module="Algo"/>
   <include module="Core"/>
   <include module="IO"/>
   <include module="Material"/>
   <include module="Process"/>
   <include module="Scene"/>
-  <function name="RevitGeneralProcess" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="ScriptLibrary.py">
+  <function name="RevitInFME" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="RevitGeneralProcess.py">
+    <parameters>
+      <parameter name="input_path" type="FilePathList" state="Stable"/>
+      <parameter name="output_path" type="String" state="Stable"/>
+      <parameter name="DimensionsSimilarity" type="Double" state="Stable"/>
+      <parameter name="PolycountSimilarity" type="Double" state="Stable"/>
+      <parameter name="RVT_uniform_code" type="String" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="RevitGeneralProcess" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="RevitGeneralProcess.py">
     <parameters>
       <parameter name="files_to_import" type="FilePathList" state="Stable"/>
       <parameter name="output_folder" type="DirectoryPath" state="Stable"/>
       <parameter name="export_name" type="String" state="Stable"/>
       <parameter name="extensions" type="StringList" state="Stable"/>
       <parameter name="key_of_files" type="String" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="FBXGeneralProcess" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="FBXProcess.py">
+    <parameters>
+      <parameter name="input_fileList" type="FilePathList" state="Stable"/>
+      <parameter name="output_folderPath" type="DirectoryPath" state="Stable"/>
+      <parameter name="export_name" type="String" state="Stable"/>
+      <parameter name="OptimizeQuality" type="QualityPreset" state="Stable"/>
     </parameters>
   </function>
   <function name="clean" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py"/>
