@@ -1,9 +1,8 @@
+import os.path
 import time
 
 import pathlib as ph
 import re
-
-DebugMode = True
 
 
 class GetParameters:
@@ -31,30 +30,73 @@ class GetParameters:
 	ISM_polycount = 0.90
 
 
-# Todo add commuication with Pixyz:
+# Todo add communication with Pixyz:
 #  core.askYesNo("question", False)
 #  core.choose("message", values, 0)
 #  core.setInteractiveMode(True)
 #  core.checkLicense()
-def RevitInFME(input_path, output_dir, output_filename, DimensionsSimilarity, PolycountSimilarity):
 
-	output_path = ph.Path(str(output_path))
-	output_folder = output_path.parent
-	output_extension = output_path.suffix
-	export_name = output_path.stem
+def MyCustomOptimization(Target_Occurrences):
+	AdvancedMerging(Target_Occurrences, 0)
+	algo.createInstancesBySimilarity([1], 0.980000000000, 0.950000000, False, False, True)
+	AdvancedDecimating(Target_Occurrences, 1)
+
+
+def IFCGeneralProcess(import_list, output_dir, output_filename, DebugMode):
+	"""
+		function used for FME flow
+		["E:\CIM_RVT\RVTStandard\建筑\4403050020120200042_前海大厦T3栋_A_JX_V1_20230517.rvt"], "E:\CIM_RVT\RVTStandard\" , MyBuilding.fbx , 0.98 , 0.90 , False
+		:param output_filename: need with extension like .fbx
+	"""
+	output_folder = ph.Path(output_dir)
+	output_extension = os.path.splitext(output_filename)[1]
+
 	log_path = output_folder / 'pixyz.log'
 	core.setLogFile(str(log_path))
 
-	model_name = ph.Path(str(input_path)).stem.split("_")[1]
-	# RVT_uniform_code = export_name.split('_')[2]
-	import_list = input_path
-	# debug print : print all the parameters
+	print('===========parameters============\n')
+	print(f'output_folder is {output_folder} \r\n')
+	print(f'output_filename is {output_filename}\r\n')
+	print(f'output_extension is {output_extension}\r\n')
+	print(f'import_list is {import_list}\r\n')
+
+	isImported = advanced_imported_scene_FME(import_list, 0.98, 0.95)
+
+	_conditions = [isImported, not DebugMode]
+	if all(_conditions):
+		serializeAvailableMetadataToJSON(output_folder)
+		algo.triangularize([1])
+		algo.optimizeForRendering([1])
+		print('=========Start exporting=========')
+
+		io.exportScene(str(os.path.join(output_folder, output_filename)))
+
+		core.resetSession()
+	get_logo(3)
+
+
+
+def RevitInFME(input_paths, output_dir, output_filename, DimensionsSimilarity, PolycountSimilarity, DebugMode):
+	"""
+	function used for FME flow
+	["E:\CIM_RVT\RVTStandard\建筑\4403050020120200042_前海大厦T3栋_A_JX_V1_20230517.rvt"], "E:\CIM_RVT\RVTStandard\" , MyBuilding.fbx , 0.98 , 0.90 , False
+	:param output_filename: need with extension like .fbx
+	"""
+
+	import_list = input_paths
+	output_folder = ph.Path(output_dir)
+
+	output_extension = os.path.splitext(output_filename)[1]
+
+	log_path = output_folder / 'pixyz.log'
+	core.setLogFile(str(log_path))
+
+
 	print('===========importing parameters============\n')
-	# print(f'output_folder is {output_folder} \r\nexport_name is {export_name}\r\n')
-	# print(f'output_extension is {output_extension}\r\n')
-	# print(f'export_name is {export_name}\r\n')
-	# print(f'model_name is {model_name}\r\n')
-	# print(f'RVT_uniform_code is {RVT_uniform_code}\r\n')
+	print(f'output_folder is {output_folder} \r\noutput_filename is {output_filename}\r\n')
+	print(f'output_extension is {output_extension}\r\n')
+	print(f'output_filename is {output_filename}\r\n')
+	print(f'model_name is {output_filename}\r\n')
 	print(f'import_list is {import_list}\r\n')
 
 	isImported = advanced_imported_scene_FME(import_list, DimensionsSimilarity, PolycountSimilarity)
@@ -63,10 +105,12 @@ def RevitInFME(input_path, output_dir, output_filename, DimensionsSimilarity, Po
 	_conditions = [isImported, not DebugMode]
 	if all(_conditions):
 		# after import then execute to export
-		advanced_export(output_folder, export_name, output_extension)
+		advanced_export(output_folder, output_filename, output_extension)
 		core.resetSession()
 	# reset session for next importing
 	get_logo(3)
+
+
 
 
 def RevitGeneralProcess(files_to_import, output_folder, export_name, extensions, key_of_files):
@@ -109,34 +153,16 @@ def advanced_imported_scene_FME(import_list, DimensionsSimilarity, PolycountSimi
 		t0, n_triangles, n_vertices, n_parts = getStats(1)
 
 		removeAllVerbose()
-		optimization_Preparation()
+		# optimization_Preparation()
 
 		##########################################
-		# 2. main optimization and resorting
-		##########################################
 		scene.resetPartTransform(1)
-		scene.mergeFinalLevel([1], 2, True)  # so that to make instances
+		scene.mergeFinalLevel([1], 2, False)  # so that to make instances
 		algo.createInstancesBySimilarity(
 			[1], DimensionsSimilarity, PolycountSimilarity,
 			ignoreSymmetry=True, keepExistingPrototypes=False, createNewOccurrencesForPrototypes=True)
 
-		elmts = GetParameters.RVT_ElementsList_ISM + GetParameters.RVT_ElementsList_One
-		TargetOccurrence = scene.getChildren(1)
-		for occ in TargetOccurrence:
-			# find by metadata
-			_count = 0
-			for i in elmts:
-				_count = _count + 1
-				_rex = '^.*' + i + '.*'
-				_ism = scene.findByMetadata(GetParameters.Category, _rex, [occ])
-				if _ism:
-					_occ1 = scene.createOccurrenceFromSelection(i, _ism, occ, True)
-					if _count > len(GetParameters.RVT_ElementsList_ISM):
-						scene.mergeParts([_occ1], 2)
-
-		scene.deleteEmptyOccurrences()
-
-		general_repair_and_decimate(RVT_uniform_code)
+		# general_repair_and_decimate(RVT_uniform_code)
 
 		t1, _n_triangles, _n_vertices, _n_parts = getStats(1)
 
@@ -253,10 +279,10 @@ def general_repair_and_decimate(RVT_uniform_code):
 
 	if RVT_uniform_code in ["结构", "总图", "钢结构", "电气", "市政"]:
 		repairing([1], 3)
-		decimating(1, 3)
+		# decimating(1, 3)
 	if RVT_uniform_code in ["机电", "建筑", "智能化", "给排水", "暖通空调", "消防"]:
 		repairing([1], 2)
-		decimating(1, 2)
+		# decimating(1, 2)
 
 
 def advanced_export(output_folder, export_name, extensions):
@@ -270,13 +296,11 @@ def advanced_export(output_folder, export_name, extensions):
 	addAllVerbose()
 	StandardSerialization(output_folder)
 
-	get_logo(2)
+	get_logo(0)
 	print('Start exporting')
-	print(f'output_folder is {output_folder} \r\nexport_name is {export_name}\r\n')
-	print('\r\n')
 
 	for extension in extensions:
-		fileName = output_folder / (export_name + extension)
+		fileName = os.path.join(output_folder, export_name+extension)
 		io.exportScene(str(fileName))
 
 
@@ -311,7 +335,7 @@ def printStats(fileName, t, n_triangles, _n_triangles, n_vertices, _n_vertices, 
 			'parts ', str(n_parts) + ' -> ' + str(_n_parts)))
 
 
-# Get logo based on logoindex
+
 def get_logo(logoindex: int):
 	# type : ANSI Shadow
 	logo1 = (r'''

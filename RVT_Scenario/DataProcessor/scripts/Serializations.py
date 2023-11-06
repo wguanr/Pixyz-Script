@@ -30,10 +30,16 @@ def StandardSerialization(output_folder):
 	target_occs = []
 	for occ in scene.getPartOccurrences(1):
 		occ_parent = scene.getParent(occ)
-		MetadataKey = 'UNIQUE_ID'
+
 		Metadata_Comps = scene.getComponentByOccurrence([occ_parent], 5, True)
+		if not Metadata_Comps[0] : continue
+		MetadataKey = str('UNIQUE_ID')
+		addAllVerbose()
+		ps = core.listProperties(Metadata_Comps[0])
+		for p in ps : print('property value is ', core.getProperty(Metadata_Comps[0], p))
+		print(scene.getNodeName(occ_parent))
 		MetadataValue = scene.getMetadata(Metadata_Comps[0], MetadataKey)
-		core.setProperty(occ, "Name", MetadataValue)
+		core.setProperty(occ, 'Name', MetadataValue)
 		target_occs.append(occ_parent)
 	serializeMetadataToJSON(target_occs, JSON_path, False)
 
@@ -105,7 +111,7 @@ def serializeMetadataToJSON(OccurrenceList, JSON_dir, JSON_file_mode):
 		return f
 
 
-def export_all_metadata_to_json_str():
+def serializeAvailableMetadataToJSON(output_folder):
 	json_data = []
 	Metadata_Comps = scene.listComponent(5)
 	for Metadata_Comp in Metadata_Comps:
@@ -124,8 +130,13 @@ def export_all_metadata_to_json_str():
 
 	json_data = list(json_data)
 	json_str = json.dumps(json_data, ensure_ascii=False, indent=4)
+	JSON_path = os.path.join(output_folder,'Local_Metadata.json')
+	print(f'=========Start JSON exporting {JSON_path}=========')
+	with open(JSON_path, 'w', encoding='utf-8') as f:
+		f.write(json_str)
+	f.close()
+	return f
 
-	return json_str
 
 
 def removeAllVerbose():

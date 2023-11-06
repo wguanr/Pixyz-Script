@@ -13,6 +13,10 @@ RVT是很标准的，考虑基于此进行开发
 ### Roadmap
 
 * WIP
+* [ ] GPU driven problem:
+  * Hidden Removal (delete parts, patches or polygons not viewed from a sphere around the scene)
+  * Smart Hidden removal (delete parts, patches or polygons not viewed from a set of cameras automatically generated)
+  * Smart Orient (reorient mesh faces from camera view points set around the 3D model)
 * [ ] *Pixyz的bug太多了。不想搞了。有一个拉起subprogress的bug，时不时地无法识别GBK字符或者无法正确转utf-8码。如果你是全英文半角的.rvt文件，应该不会有任何问题。后续交给老哥用fme走吧。我要去继续研究UE了。*
 * [x] 解决实例Transform没有归零的问题。
   * 也可以通过ue脚本来实现。

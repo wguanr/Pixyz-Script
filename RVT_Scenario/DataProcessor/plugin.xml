@@ -8,11 +8,20 @@
   <include module="Scene"/>
   <function name="RevitInFME" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="RevitGeneralProcess.py">
     <parameters>
-      <parameter name="input_path" type="FilePathList" state="Stable"/>
-      <parameter name="output_path" type="String" state="Stable"/>
+      <parameter name="input_paths" type="FilePathList" state="Stable"/>
+      <parameter name="output_dir" type="DirectoryPath" state="Stable"/>
+      <parameter name="output_filename" type="String" state="Stable"/>
       <parameter name="DimensionsSimilarity" type="Double" state="Stable"/>
       <parameter name="PolycountSimilarity" type="Double" state="Stable"/>
-      <parameter name="RVT_uniform_code" type="String" state="Stable"/>
+      <parameter name="DebugMode" type="Bool" optional="true" default="True" state="Stable"/>
+    </parameters>
+  </function>
+  <function name="IFCGeneralProcess" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="RevitGeneralProcess.py">
+    <parameters>
+      <parameter name="import_list" type="FilePathList" state="Stable"/>
+      <parameter name="output_dir" type="DirectoryPath" state="Stable"/>
+      <parameter name="output_filename" type="String" state="Stable"/>
+      <parameter name="DebugMode" type="Bool" optional="true" default="True" state="Stable"/>
     </parameters>
   </function>
   <function name="RevitGeneralProcess" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="RevitGeneralProcess.py">
@@ -24,24 +33,46 @@
       <parameter name="key_of_files" type="String" state="Stable"/>
     </parameters>
   </function>
+  <function name="advanced_export" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="RevitGeneralProcess.py">
+    <parameters>
+      <parameter name="output_folder" type="DirectoryPath" state="Stable"/>
+      <parameter name="export_name" type="String" state="Stable"/>
+      <parameter name="extensions" type="StringList" state="Stable"/>
+    </parameters>
+  </function>
+
   <function name="clean" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py"/>
   <function name="clean_filtered_occurrences" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="CleanBot.py">
     <parameters>
       <parameter name="FilterExpression" type="FilterExpression" state="Stable"/>
     </parameters>
   </function>
-  <function name="decimating" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
+  <function name="AdvancedDecimating" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
     <parameters>
-      <parameter name="Target_Occurrence" type="OccurrenceList" state="Stable"/>
+      <parameter name="Target_Occurrences" type="OccurrenceList" state="Stable"/>
       <parameter name="Model_Quality" type="QualityPreset" state="Stable"/>
     </parameters>
   </function>
+
   <function name="repairing" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
     <parameters>
-      <parameter name="Target_Occurences" type="OccurrenceList" state="Stable"/>
+      <parameter name="Target_Occurrences" type="OccurrenceList" state="Stable"/>
       <parameter name="Model_Quality" type="QualityPreset" state="Stable"/>
     </parameters>
   </function>
+  <function name="AdvancedMerging" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="GeometryOptimazation.py">
+    <parameters>
+      <parameter name="Target_Occurrences" type="OccurrenceList" state="Stable"/>
+      <parameter name="Type" type="Int" state="Stable"/>
+    </parameters>
+  </function>
+
+  <function name="serializeAvailableMetadataToJSON" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="Serializations.py"/>
+    <parameters>
+      <parameter name="output_folder" type="String" state="Stable"/>
+    </parameters>
+  </function>
+
   <function name="serializeMetadataToJSON" state="Stable" scriptable="true" guiable="true" description="" logName="" scriptFile="Serializations.py">
     <parameters>
       <parameter name="OccurrenceList" type="OccurrenceList" state="Stable"/>

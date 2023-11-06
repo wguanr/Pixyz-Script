@@ -108,6 +108,7 @@ def excute_subprocess(import_list, output_folder, export_name, extensions, _k):
 	root_args = parser.parse_args()
 	print(root_args)
 
+
 	arg = [r'PiXYZScenarioProcessor',
 	         'ScriptLibrary',
 	         'RevitGeneralProcess',
@@ -126,14 +127,26 @@ def excute_subprocess(import_list, output_folder, export_name, extensions, _k):
 	       "\""+str(extensions)+"\"",
 	      "\""+_k+"\""]
 	'''
+	# arg = [r'PiXYZScenarioProcessor',
+	#        'ScriptLibrary',
+	#        'RevitGeneralProcess',
+	#        str(import_list),
+	#        "\"" + (output_folder) + "\"",
+	#        "\"" + (export_name) + "\"",
+	#        str(extensions),
+	#       "\""+_k+"\""]
+
+
+	# 	PiXYZScenarioProcessor DataProcessor RevitInFME "[\"E:\\temp\\4403050020120200042_A_JX_V1_20230517.rvt\"]" "\"E:\CIM_RVT\RVTStandard\"" "\"MyBuilding.fbx"\" 0.98 0.90 False
 	arg = [r'PiXYZScenarioProcessor',
-	       'ScriptLibrary',
-	       'RevitGeneralProcess',
+	       'DataProcessor',
+	       'RevitInFME',
 	       str(import_list),
 	       "\"" + (output_folder) + "\"",
 	       "\"" + (export_name) + "\"",
 	       str(extensions),
-	      "\""+_k+"\""]
+	       "\"" + _k + "\""]
+
 	# encoding='utf-8' to get the same with Pixyz Scenario Processor encoding setting
 	# but sometimes it will cause error, so to delete the encoding setting
 	p = subprocess.Popen(
